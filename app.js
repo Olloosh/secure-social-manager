@@ -151,6 +151,13 @@ document.getElementById('go-to-login')?.addEventListener('click', (e) => {
 // Auth Storage (localStorage, SHA-256 hashed passwords)
 // ========================================
 const USERS_KEY = 'ssm_users';
+const SESSION_KEY = 'ssm_session';
+
+// Hardcoded admin email — seeded on first load
+const ADMIN_EMAIL    = 'admin@ssm.uz';
+const ADMIN_PASSWORD = 'admin123';
+
+function isAdmin(email) { return (email || '').toLowerCase() === ADMIN_EMAIL; }
 
 async function sha256(str) {
   const buf = new TextEncoder().encode(str);
@@ -963,13 +970,153 @@ document.getElementById('add-account-btn')?.addEventListener('click', () => {
   document.getElementById('login-form')?.reset();
 });
 
+// ═══════════════════════════════════════════════════════════
+//  ADMIN PANEL
+// ═══════════════════════════════════════════════════════════
+
+// Seed admin account if missing
+async function seedAdmin() {
+  const users = loadUsers();
+  if (!users[ADMIN_EMAIL]) {
+    users[ADMIN_EMAIL] = {
+      name:         'Admin',
+      passwordHash: await sha256(ADMIN_PASSWORD),
+      created_at:   Date.now(),
+      role:         'admin',
+    };
+    saveUsers(users);
+    console.log(`🛡 Admin seeded: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`);
+  }
+}
+
+// Toggle admin nav visibility based on current session
+function refreshAdminNav() {
+  const active = savedAccounts.find(a => a.active);
+  const navAdmin = document.getElementById('nav-admin');
+  if (!navAdmin) return;
+  if (active && isAdmin(active.email)) navAdmin.classList.remove('hidden');
+  else                                 navAdmin.classList.add('hidden');
+}
+
+// Storage size helper
+function bytesOfLocalStorage() {
+  let total = 0;
+  for (let k in localStorage) if (localStorage.hasOwnProperty(k)) {
+    total += ((localStorage[k] || '').length + k.length) * 2; // utf-16
+  }
+  return total;
+}
+function formatBytes(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+  return (n / (1024 * 1024)).toFixed(2) + ' MB';
+}
+
+// Render all admin panel content
+function renderAdminPanel() {
+  const users = loadUsers();
+  const emails = Object.keys(users);
+  const oauth  = JSON.parse(localStorage.getItem(OAUTH_STORE_KEY) || '{}');
+  const oauthPlatforms = Object.keys(oauth);
+
+  document.getElementById('admin-stat-users').textContent   = emails.length;
+  document.getElementById('admin-stat-oauth').textContent   = oauthPlatforms.length;
+  document.getElementById('admin-stat-storage').textContent = formatBytes(bytesOfLocalStorage());
+  document.getElementById('admin-stat-session').textContent =
+    new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
+
+  // Users table
+  const tbody = document.getElementById('admin-users-body');
+  if (!emails.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="admin-empty">Hali foydalanuvchilar yo\'q</td></tr>';
+  } else {
+    tbody.innerHTML = emails.map(email => {
+      const u = users[email];
+      const isAdm = isAdmin(email);
+      const date = new Date(u.created_at).toLocaleString('uz-UZ', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+      return `
+        <tr>
+          <td><span class="admin-email">${email}</span>${isAdm ? '<span class="admin-role-badge">ADMIN</span>' : ''}</td>
+          <td>${u.name}</td>
+          <td>${date}</td>
+          <td>${isAdm ? '<span style="color:#9ca3af;font-size:0.78rem;">— (himoyalangan)</span>' : `<button class="admin-action-btn" data-del-user="${email}">O'chirish</button>`}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  // OAuth chips
+  const oauthWrap = document.getElementById('admin-oauth-list');
+  if (!oauthPlatforms.length) {
+    oauthWrap.innerHTML = '<p class="admin-empty">Hech qanday akkaunt ulanmagan</p>';
+  } else {
+    oauthWrap.innerHTML = oauthPlatforms.map(pid => {
+      const d = oauth[pid];
+      const label = d.username || d.name || d.first_name || d.user_id || '—';
+      return `
+        <div class="admin-oauth-chip">
+          <span class="admin-oauth-chip-dot"></span>
+          <strong>${pid}</strong>
+          <span style="color:#6b7280;">${label}</span>
+        </div>`;
+    }).join('');
+  }
+}
+
+// Delete user action
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-del-user]');
+  if (!btn) return;
+  const email = btn.dataset.delUser;
+  if (!confirm(`"${email}" foydalanuvchisini o'chirishni tasdiqlaysizmi?`)) return;
+  const users = loadUsers();
+  delete users[email];
+  saveUsers(users);
+  renderAdminPanel();
+  showToast(`${email} o'chirildi`, 'success');
+});
+
+// Danger zone handlers
+document.getElementById('admin-clear-users')?.addEventListener('click', () => {
+  if (!confirm('Barcha foydalanuvchilar o\'chiriladi (admin qoladi). Davom etasizmi?')) return;
+  const users = loadUsers();
+  const adminUser = users[ADMIN_EMAIL];
+  saveUsers(adminUser ? { [ADMIN_EMAIL]: adminUser } : {});
+  renderAdminPanel();
+  showToast('Foydalanuvchilar bazasi tozalandi', 'success');
+});
+document.getElementById('admin-clear-oauth')?.addEventListener('click', () => {
+  if (!confirm('Barcha OAuth ulanishlar o\'chiriladi. Davom etasizmi?')) return;
+  localStorage.removeItem(OAUTH_STORE_KEY);
+  // Reset UI
+  connectedSet.clear();
+  renderAdminPanel();
+  showToast('OAuth ulanishlar tozalandi', 'success');
+});
+document.getElementById('admin-clear-all')?.addEventListener('click', () => {
+  if (!confirm('LOCALSTORAGE TO\'LIQ TOZALANADI. Sahifa yangilanadi. Davom etasizmi?')) return;
+  localStorage.clear();
+  location.reload();
+});
+document.getElementById('admin-refresh')?.addEventListener('click', renderAdminPanel);
+
+// Re-render admin when navigating to it
+document.querySelector('[data-page="admin"]')?.addEventListener('click', renderAdminPanel);
+
+// Also refresh admin nav after account switches
+const _origAddAndSwitch = addAndSwitchAccount;
+window.addAndSwitchAccount = function (...args) {
+  _origAddAndSwitch(...args);
+  refreshAdminNav();
+};
+
 // ========================================
 // Initialize
 // ========================================
-document.addEventListener('DOMContentLoaded', () => {
-  // Start with login page
+document.addEventListener('DOMContentLoaded', async () => {
+  await seedAdmin();
+  refreshAdminNav();
   showPage('login');
 
   console.log('🔐 Secure Social Manager initialized');
-  console.log('This is a demo application for university presentation.');
+  console.log(`🛡 Admin login: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`);
 });

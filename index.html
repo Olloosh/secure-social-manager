@@ -185,6 +185,11 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
             <span>Settings</span>
           </div>
+          <div class="nav-item nav-admin hidden" id="nav-admin" data-page="admin">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 4v6c0 5-4 9-9 10-5-1-9-5-9-10V6l9-4z"/><path d="M9 12l2 2 4-4"/></svg>
+            <span>Admin Panel</span>
+            <span class="nav-badge">★</span>
+          </div>
         </div>
       </nav>
       
@@ -814,6 +819,111 @@
                 </div>
               </div>
 
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================
+             ADMIN PANEL
+             ======================================== -->
+        <section id="section-admin" class="page hidden">
+          <div class="welcome-section">
+            <h1>🛡️ Admin Panel</h1>
+            <p>Foydalanuvchilar, OAuth ulanishlar va demo holatini boshqarish.</p>
+          </div>
+
+          <!-- Stat cards -->
+          <div class="admin-stats">
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon" style="background:#6366F1;">👥</div>
+              <div>
+                <div class="admin-stat-label">Registered users</div>
+                <div class="admin-stat-value" id="admin-stat-users">0</div>
+              </div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon" style="background:#10B981;">🔗</div>
+              <div>
+                <div class="admin-stat-label">OAuth connections</div>
+                <div class="admin-stat-value" id="admin-stat-oauth">0</div>
+              </div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon" style="background:#F59E0B;">💾</div>
+              <div>
+                <div class="admin-stat-label">Storage used</div>
+                <div class="admin-stat-value" id="admin-stat-storage">0 B</div>
+              </div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon" style="background:#EC4899;">🕐</div>
+              <div>
+                <div class="admin-stat-label">Session started</div>
+                <div class="admin-stat-value" id="admin-stat-session">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Users table -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3>Registered Users</h3>
+              <button class="btn btn-outline btn-sm" id="admin-refresh">↻ Yangilash</button>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Ism</th>
+                    <th>Ro'yxatdan o'tgan</th>
+                    <th>Amallar</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-body">
+                  <tr><td colspan="4" class="admin-empty">Hali foydalanuvchilar yo'q</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- OAuth connections -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3>OAuth Connections</h3>
+            </div>
+            <div id="admin-oauth-list" class="admin-oauth-list">
+              <p class="admin-empty">Hech qanday akkaunt ulanmagan</p>
+            </div>
+          </div>
+
+          <!-- Danger zone -->
+          <div class="admin-card admin-danger">
+            <div class="admin-card-header">
+              <h3>⚠️ Danger Zone</h3>
+            </div>
+            <div class="admin-danger-list">
+              <div class="admin-danger-row">
+                <div>
+                  <strong>Foydalanuvchilar bazasini tozalash</strong>
+                  <p>Barcha ro'yxatdan o'tgan foydalanuvchilarni o'chiradi</p>
+                </div>
+                <button class="btn btn-danger" id="admin-clear-users">Tozalash</button>
+              </div>
+              <div class="admin-danger-row">
+                <div>
+                  <strong>OAuth ulanishlarni tozalash</strong>
+                  <p>Barcha Facebook/Instagram/Telegram token'larni o'chiradi</p>
+                </div>
+                <button class="btn btn-danger" id="admin-clear-oauth">Tozalash</button>
+              </div>
+              <div class="admin-danger-row">
+                <div>
+                  <strong>Hamma ma'lumotlarni tozalash</strong>
+                  <p>LocalStorage to'liq tozalanadi + sahifa yangilanadi</p>
+                </div>
+                <button class="btn btn-danger" id="admin-clear-all">Hammasini tozalash</button>
+              </div>
             </div>
           </div>
         </section>
