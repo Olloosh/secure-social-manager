@@ -20,8 +20,8 @@
         linked to a Facebook Page (Meta requirement).
    ───────────────────────────────────────────────────────────── */
 window.OAUTH_CONFIG = {
-  TELEGRAM_BOT_USERNAME: '',   // e.g. "MySSM_bot"
-  FACEBOOK_APP_ID:       '',   // e.g. "1234567890123456"
+  TELEGRAM_BOT_USERNAME: '',                  // to be filled after @BotFather setup
+  FACEBOOK_APP_ID:       '1487980476353532',  // Social Manager app
 
   // Permissions we ask for. Leave as-is unless you know why
   // you are changing them. Full posting access is gated behind
