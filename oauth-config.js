@@ -27,8 +27,12 @@ window.OAUTH_CONFIG = {
   // you are changing them. Full posting access is gated behind
   // Meta App Review; until your app is reviewed, only admins/
   // developers/testers of the app can grant these.
-  FACEBOOK_SCOPES:
-    'public_profile,email,pages_show_list,pages_read_engagement,pages_manage_posts',
-  INSTAGRAM_SCOPES:
-    'public_profile,email,pages_show_list,instagram_basic,instagram_content_publish,pages_read_engagement',
+  // Demo-time defaults: only "public_profile" is granted out-of-the-box in
+  // Development Mode. Anything beyond it (email, pages_*, instagram_*) needs
+  // to be explicitly added in the Meta dashboard:
+  //   Use cases → Customize → Permissions → Request.
+  // Advanced permissions require App Review before non-admin users can grant
+  // them. Kept scopes minimal so the OAuth dialog opens cleanly for admins.
+  FACEBOOK_SCOPES:  'public_profile',
+  INSTAGRAM_SCOPES: 'public_profile',
 };
