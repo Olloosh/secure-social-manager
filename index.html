@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Secure Social Manager - A secure web-based social media management platform for scheduling and managing posts across multiple platforms.">
+  <title>Secure Social Manager - Secure SMM Platform</title>
+  <link rel="stylesheet" href="index.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
+</head>
+<body>
+  <!-- ========================================
+       LOGIN PAGE
+       ======================================== -->
+  <div id="page-login" class="auth-layout page">
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <div class="logo-icon">🔐</div>
+          <h1>Secure Social</h1>
+        </div>
+        <h2 class="auth-title">Welcome back</h2>
+        <p class="auth-subtitle">Sign in to manage your social media securely</p>
+        
+        <form class="auth-form" id="login-form">
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email address</label>
+            <div class="input-group">
+              <span class="input-icon">📧</span>
+              <input type="email" id="login-email" class="form-input" placeholder="you@example.com" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <div class="input-group">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="login-password" class="form-input has-toggle" placeholder="Enter your password" required>
+              <button type="button" class="password-toggle" data-target="login-password" aria-label="Show password">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+          
+          <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+            <label class="toggle-switch" style="font-size: 0.875rem;">
+              <input type="checkbox">
+              <span class="toggle-slider"></span>
+              Remember me
+            </label>
+            <a href="#" style="font-size: 0.875rem;">Forgot password?</a>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-lg btn-block">
+            Sign in securely
+          </button>
+        </form>
+        
+        <div class="auth-footer">
+          <p>Don't have an account? <a href="#" id="go-to-register">Create account</a></p>
+        </div>
+        
+        <div style="margin-top: 1.5rem;">
+          <div class="security-badge" style="display: inline-flex;">
+            <span>🛡️</span>
+            <span>Protected by 256-bit encryption</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       REGISTER PAGE
+       ======================================== -->
+  <div id="page-register" class="auth-layout page hidden">
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <div class="logo-icon">🔐</div>
+          <h1>Secure Social</h1>
+        </div>
+        <h2 class="auth-title">Create account</h2>
+        <p class="auth-subtitle">Start managing your social media securely</p>
+        
+        <form class="auth-form" id="register-form">
+          <div class="form-group">
+            <label class="form-label" for="register-name">Full name <span style="color: var(--color-gray-400);">(optional)</span></label>
+            <div class="input-group">
+              <span class="input-icon">👤</span>
+              <input type="text" id="register-name" class="form-input" placeholder="John Doe">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="register-email">Email address</label>
+            <div class="input-group">
+              <span class="input-icon">📧</span>
+              <input type="email" id="register-email" class="form-input" placeholder="you@example.com" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="register-password">Password</label>
+            <div class="input-group">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="register-password" class="form-input has-toggle" placeholder="Create a strong password" required>
+              <button type="button" class="password-toggle" data-target="register-password" aria-label="Show password">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="strength-meter" id="strength-meter" style="display:none;">
+              <div class="strength-bars">
+                <div class="strength-bar" id="sb1"></div>
+                <div class="strength-bar" id="sb2"></div>
+                <div class="strength-bar" id="sb3"></div>
+                <div class="strength-bar" id="sb4"></div>
+              </div>
+              <span class="strength-label" id="strength-label"></span>
+            </div>
+            <p class="form-hint">Must be at least 8 characters with a mix of letters and numbers</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="toggle-switch" style="font-size: 0.875rem;">
+              <input type="checkbox" required>
+              <span class="toggle-slider"></span>
+              I agree to the Terms of Service and Privacy Policy
+            </label>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-lg btn-block">
+            Create secure account
+          </button>
+        </form>
+        
+        <div class="auth-footer">
+          <p>Already have an account? <a href="#" id="go-to-login">Sign in</a></p>
+        </div>
+        
+        <div style="margin-top: 1.5rem;">
+          <div class="security-badge" style="display: inline-flex;">
+            <span>🔐</span>
+            <span>Secure registration</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       DASHBOARD LAYOUT (Contains all app pages)
+       ======================================== -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  <div id="app-layout" class="dashboard-layout hidden">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="logo-icon">🔐</div>
+          <span>Secure Social</span>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <div class="nav-item active" data-page="dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <span>Dashboard</span>
+          </div>
+          <div class="nav-item" data-page="create-post">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Create Post</span>
+          </div>
+          <div class="nav-item" data-page="analytics">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+            <span>Analytics</span>
+          </div>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Account</div>
+          <div class="nav-item" data-page="settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            <span>Settings</span>
+          </div>
+        </div>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div class="nav-item" id="logout-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          <span>Logout</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+          </button>
+          <h2 id="page-title">Dashboard</h2>
+        </div>
+        <div class="topbar-right">
+          <div class="security-badge">
+            <span>🛡️</span>
+            <span>Secure Session</span>
+          </div>
+
+          <!-- User Menu with Account Switcher -->
+          <div class="user-menu-wrapper" id="user-menu-wrapper">
+            <div class="user-menu" id="user-menu-btn">
+              <div class="user-avatar" id="topbar-avatar">JD</div>
+              <div class="user-info">
+                <div class="name" id="topbar-name">John Doe</div>
+                <div class="role" id="topbar-role">Pro User</div>
+              </div>
+              <svg class="user-menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+
+            <!-- Account Dropdown -->
+            <div class="account-dropdown hidden" id="account-dropdown">
+              <div class="account-dropdown-header">Akkauntlar</div>
+              <div class="account-list" id="account-list"></div>
+              <div class="account-dropdown-footer">
+                <button class="account-add-btn" id="add-account-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 5v14M5 12h14"/></svg>
+                  Akkaunt qo'shish
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </header>
+
+      <!-- Page Content Container -->
+      <div class="page-content">
+        <!-- ========================================
+             DASHBOARD PAGE
+             ======================================== -->
+        <section id="section-dashboard" class="page">
+          <div class="welcome-section">
+            <h1>Welcome back, John! 👋</h1>
+            <p>Here's what's happening with your social media accounts today.</p>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="stats-grid">
+            <div class="card stat-card">
+              <div class="stat-icon primary">📅</div>
+              <div class="stat-content">
+                <h3>12</h3>
+                <p>Scheduled Posts</p>
+              </div>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-icon success">🔗</div>
+              <div class="stat-content">
+                <h3>2</h3>
+                <p>Platforms Connected</p>
+              </div>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-icon primary">📊</div>
+              <div class="stat-content">
+                <h3>2.4K</h3>
+                <p>Total Reach</p>
+              </div>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-icon success">🔒</div>
+              <div class="stat-content">
+                <h3>Secure</h3>
+                <p>Security Status</p>
+                <span class="badge badge-success" style="margin-top: 0.5rem;">Protected</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="quick-actions">
+            <button class="btn btn-primary" id="quick-create-post">
+              <span>➕</span> Create New Post
+            </button>
+            <button class="btn btn-outline" id="quick-view-analytics">
+              <span>📈</span> View Analytics
+            </button>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Recent Activity</h3>
+            </div>
+            <div class="card-body">
+              <div class="activity-list">
+                <div class="activity-item">
+                  <div class="activity-icon" style="background: var(--color-primary-light); color: var(--color-primary);">📱</div>
+                  <div class="activity-content">
+                    <p><strong>Post published</strong> on Instagram</p>
+                    <span class="time">2 hours ago</span>
+                  </div>
+                  <span class="badge badge-success">Success</span>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon" style="background: #E3F2FD; color: #0088CC;">✈️</div>
+                  <div class="activity-content">
+                    <p><strong>Post scheduled</strong> for Telegram</p>
+                    <span class="time">4 hours ago</span>
+                  </div>
+                  <span class="badge badge-primary">Scheduled</span>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon" style="background: var(--color-success-light); color: var(--color-success);">🔐</div>
+                  <div class="activity-content">
+                    <p><strong>Two-factor authentication</strong> enabled</p>
+                    <span class="time">Yesterday</span>
+                  </div>
+                  <span class="badge badge-success">Security</span>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon" style="background: var(--color-warning-light); color: var(--color-warning);">🔗</div>
+                  <div class="activity-content">
+                    <p><strong>Telegram account</strong> connected</p>
+                    <span class="time">2 days ago</span>
+                  </div>
+                  <span class="badge badge-warning">Integration</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================
+             CREATE POST PAGE
+             ======================================== -->
+        <section id="section-create-post" class="page hidden">
+          <div class="welcome-section">
+            <h1>Create & Schedule Post</h1>
+            <p>Compose your content and schedule it for the perfect time.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <form id="create-post-form">
+                <!-- Platform Selector -->
+                <div class="form-group">
+                  <label class="form-label">Select Platform</label>
+                  <div class="platform-selector">
+                    <label class="platform-option active">
+                      <input type="radio" name="platform" value="telegram" checked>
+                      <div class="platform-icon telegram">✈️</div>
+                      <div>
+                        <strong>Telegram</strong>
+                        <p style="font-size: 0.75rem; color: var(--color-gray-500); margin: 0;">Channel or Group</p>
+                      </div>
+                    </label>
+                    <label class="platform-option">
+                      <input type="radio" name="platform" value="instagram">
+                      <div class="platform-icon instagram">📷</div>
+                      <div>
+                        <strong>Instagram</strong>
+                        <p style="font-size: 0.75rem; color: var(--color-gray-500); margin: 0;">Feed Post</p>
+                      </div>
+                    </label>
+                    <label class="platform-option">
+                      <input type="radio" name="platform" value="facebook">
+                      <div class="platform-icon facebook">🔵</div>
+                      <div>
+                        <strong>Facebook</strong>
+                        <p style="font-size: 0.75rem; color: var(--color-gray-500); margin: 0;">Page or Group</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Post Content -->
+                <div class="form-group">
+                  <label class="form-label" for="post-content">Post Content</label>
+                  <textarea id="post-content" class="form-textarea" placeholder="What would you like to share?" rows="5" required></textarea>
+                  <p class="form-hint"><span id="char-count">0</span>/2200 characters</p>
+                </div>
+
+                <!-- Date Time Picker -->
+                <div class="datetime-picker">
+                  <div class="form-group">
+                    <label class="form-label" for="post-date">Schedule Date</label>
+                    <input type="date" id="post-date" class="form-input" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="post-time">Schedule Time</label>
+                    <input type="time" id="post-time" class="form-input" required>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                  <button type="submit" class="btn btn-primary btn-lg">
+                    <span>📅</span> Schedule Post
+                  </button>
+                  <button type="button" class="btn btn-outline btn-lg" id="save-draft-btn">
+                    <span>💾</span> Save Draft
+                  </button>
+                </div>
+              </form>
+
+              <!-- Success Message -->
+              <div class="success-message" id="schedule-success">
+                <span style="font-size: 1.5rem;">✅</span>
+                <div>
+                  <strong>Post scheduled successfully!</strong>
+                  <p style="margin: 0; font-size: 0.875rem;">Your post will be published at the scheduled time.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Post Preview -->
+          <div class="post-preview">
+            <h4>Live Preview</h4>
+            <div class="preview-content">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                <div class="user-avatar" style="width: 40px; height: 40px;">JD</div>
+                <div>
+                  <strong>John Doe</strong>
+                  <p style="margin: 0; font-size: 0.75rem; color: var(--color-gray-500);" id="preview-platform">Telegram • Scheduled</p>
+                </div>
+              </div>
+              <p id="preview-text" style="color: var(--color-gray-600); min-height: 60px;">Your post content will appear here...</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================
+             ANALYTICS PAGE
+             ======================================== -->
+        <section id="section-analytics" class="page hidden">
+          <div class="analytics-header">
+            <div>
+              <h1>Analytics Overview</h1>
+              <p class="text-muted">Track your social media performance</p>
+            </div>
+            <div class="date-range-selector">
+              <button class="date-range-btn">7 Days</button>
+              <button class="date-range-btn active">30 Days</button>
+              <button class="date-range-btn">90 Days</button>
+            </div>
+          </div>
+
+          <!-- Engagement Stats -->
+          <div class="engagement-grid mb-6">
+            <div class="engagement-card">
+              <div class="value">12.5K</div>
+              <div class="label">Total Reach</div>
+              <div class="change positive">↑ 12.5%</div>
+            </div>
+            <div class="engagement-card">
+              <div class="value">3.2K</div>
+              <div class="label">Engagement</div>
+              <div class="change positive">↑ 8.3%</div>
+            </div>
+            <div class="engagement-card">
+              <div class="value">847</div>
+              <div class="label">Likes</div>
+              <div class="change positive">↑ 15.2%</div>
+            </div>
+            <div class="engagement-card">
+              <div class="value">156</div>
+              <div class="label">Shares</div>
+              <div class="change negative">↓ 2.1%</div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="charts-grid">
+            <div class="chart-card">
+              <h4>📈 Reach Over Time</h4>
+              <div class="chart-placeholder">
+                <div class="chart-bar" style="height: 45%;"></div>
+                <div class="chart-bar" style="height: 60%;"></div>
+                <div class="chart-bar" style="height: 35%;"></div>
+                <div class="chart-bar" style="height: 75%;"></div>
+                <div class="chart-bar" style="height: 55%;"></div>
+                <div class="chart-bar" style="height: 90%;"></div>
+                <div class="chart-bar" style="height: 70%;"></div>
+                <div class="chart-bar" style="height: 85%;"></div>
+                <div class="chart-bar" style="height: 60%;"></div>
+                <div class="chart-bar" style="height: 80%;"></div>
+                <div class="chart-bar" style="height: 95%;"></div>
+                <div class="chart-bar" style="height: 75%;"></div>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h4>❤️ Engagement Rate</h4>
+              <div class="chart-placeholder">
+                <div class="chart-bar" style="height: 70%; background: linear-gradient(180deg, #10B981, #34D399);"></div>
+                <div class="chart-bar" style="height: 55%; background: linear-gradient(180deg, #10B981, #34D399);"></div>
+                <div class="chart-bar" style="height: 80%; background: linear-gradient(180deg, #10B981, #34D399);"></div>
+                <div class="chart-bar" style="height: 65%; background: linear-gradient(180deg, #10B981, #34D399);"></div>
+                <div class="chart-bar" style="height: 90%; background: linear-gradient(180deg, #10B981, #34D399);"></div>
+                <div class="chart-bar" style="height: 75%; background: linear-gradient(180deg, #10B981, #34D399);"></div>
+                <div class="chart-bar" style="height: 85%; background: linear-gradient(180deg, #10B981, #34D399);"></div>
+                <div class="chart-bar" style="height: 60%; background: linear-gradient(180deg, #10B981, #34D399);"></div>
+                <div class="chart-bar" style="height: 70%; background: linear-gradient(180deg, #10B981, #34D399);"></div>
+                <div class="chart-bar" style="height: 95%; background: linear-gradient(180deg, #10B981, #34D399);"></div>
+                <div class="chart-bar" style="height: 80%; background: linear-gradient(180deg, #10B981, #34D399);"></div>
+                <div class="chart-bar" style="height: 85%; background: linear-gradient(180deg, #10B981, #34D399);"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Platform Breakdown -->
+          <div class="card mt-6">
+            <div class="card-header">
+              <h3>Platform Performance</h3>
+            </div>
+            <div class="card-body">
+              <div style="display: flex; gap: 2rem;">
+                <div style="flex: 1; padding: 1.5rem; background: var(--color-gray-50); border-radius: var(--radius-lg);">
+                  <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                    <div class="platform-icon telegram" style="width: 48px; height: 48px;">✈️</div>
+                    <div>
+                      <strong>Telegram</strong>
+                      <p style="margin: 0; color: var(--color-gray-500); font-size: 0.875rem;">8 posts this month</p>
+                    </div>
+                  </div>
+                  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
+                    <div>
+                      <div style="font-size: 1.25rem; font-weight: 700;">6.8K</div>
+                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Reach</div>
+                    </div>
+                    <div>
+                      <div style="font-size: 1.25rem; font-weight: 700;">1.2K</div>
+                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Views</div>
+                    </div>
+                    <div>
+                      <div style="font-size: 1.25rem; font-weight: 700;">89</div>
+                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Shares</div>
+                    </div>
+                  </div>
+                </div>
+                <div style="flex: 1; padding: 1.5rem; background: var(--color-gray-50); border-radius: var(--radius-lg);">
+                  <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                    <div class="platform-icon instagram" style="width: 48px; height: 48px;">📷</div>
+                    <div>
+                      <strong>Instagram</strong>
+                      <p style="margin: 0; color: var(--color-gray-500); font-size: 0.875rem;">5 posts this month</p>
+                    </div>
+                  </div>
+                  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
+                    <div>
+                      <div style="font-size: 1.25rem; font-weight: 700;">5.7K</div>
+                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Reach</div>
+                    </div>
+                    <div>
+                      <div style="font-size: 1.25rem; font-weight: 700;">758</div>
+                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Likes</div>
+                    </div>
+                    <div>
+                      <div style="font-size: 1.25rem; font-weight: 700;">67</div>
+                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Comments</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================
+             SETTINGS PAGE
+             ======================================== -->
+        <section id="section-settings" class="page hidden">
+          <div class="welcome-section">
+            <h1>Settings & Security</h1>
+            <p>Manage your account preferences and security options.</p>
+          </div>
+
+          <div class="settings-grid">
+            <!-- Settings Navigation -->
+            <div class="settings-nav">
+              <div class="settings-nav-item active" data-settings="security">
+                <span>🔒</span> Security
+              </div>
+              <div class="settings-nav-item" data-settings="account">
+                <span>👤</span> Account
+              </div>
+              <div class="settings-nav-item" data-settings="platforms">
+                <span>🔗</span> Platforms
+              </div>
+              <div class="settings-nav-item" data-settings="notifications">
+                <span>🔔</span> Notifications
+              </div>
+            </div>
+
+            <!-- Settings Content -->
+            <div class="settings-content">
+
+              <!-- SECURITY PANEL -->
+              <div data-settings-panel="security">
+                <div class="settings-section">
+                  <h3>🔐 Security Settings</h3>
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <h4>Two-Factor Authentication</h4>
+                      <p>Add an extra layer of security to your account</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" id="2fa-toggle" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <h4>Change Password</h4>
+                      <p>Update your password regularly for better security</p>
+                    </div>
+                    <button class="btn btn-outline" id="change-password-btn">Change Password</button>
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <h4>Login Notifications</h4>
+                      <p>Get notified when someone logs into your account</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="settings-section">
+                  <h3>📋 Security Activity Log</h3>
+                  <div class="security-log">
+                    <div class="log-item">
+                      <div class="log-icon success">✓</div>
+                      <div class="log-content">
+                        <div class="action">Successful login</div>
+                        <div class="details">Chrome on macOS • San Francisco, CA</div>
+                      </div>
+                      <div class="log-time">Today, 2:30 PM</div>
+                    </div>
+                    <div class="log-item">
+                      <div class="log-icon success">✓</div>
+                      <div class="log-content">
+                        <div class="action">2FA enabled</div>
+                        <div class="details">Security setting updated</div>
+                      </div>
+                      <div class="log-time">Yesterday, 10:15 AM</div>
+                    </div>
+                    <div class="log-item">
+                      <div class="log-icon warning">!</div>
+                      <div class="log-content">
+                        <div class="action">Failed login attempt</div>
+                        <div class="details">Chrome on Windows • Unknown location</div>
+                      </div>
+                      <div class="log-time">Jan 28, 8:45 PM</div>
+                    </div>
+                    <div class="log-item">
+                      <div class="log-icon success">✓</div>
+                      <div class="log-content">
+                        <div class="action">Password changed</div>
+                        <div class="details">Security setting updated</div>
+                      </div>
+                      <div class="log-time">Jan 25, 3:20 PM</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="settings-section" style="background: linear-gradient(135deg, var(--color-success-light), #A7F3D0); border: 1px solid var(--color-success);">
+                  <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span style="font-size: 2rem;">🛡️</span>
+                    <div>
+                      <h3 style="margin: 0; border: none; padding: 0;">Your Account is Protected</h3>
+                      <p style="margin: 0.5rem 0 0; color: var(--color-gray-600);">Two-factor authentication is enabled. Your session is encrypted with 256-bit SSL.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ACCOUNT PANEL -->
+              <div data-settings-panel="account" class="hidden">
+                <div class="settings-section">
+                  <h3>👤 Account Information</h3>
+                  <div class="form-group">
+                    <label class="form-label" for="account-name">Full Name</label>
+                    <input type="text" id="account-name" class="form-input" value="John Doe">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="account-email">Email Address</label>
+                    <input type="email" id="account-email" class="form-input" value="john@example.com">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="account-username">Username</label>
+                    <input type="text" id="account-username" class="form-input" value="@johndoe">
+                  </div>
+                  <button class="btn btn-primary" id="save-account-btn">Save Changes</button>
+                </div>
+                <div class="settings-section">
+                  <h3>🗑️ Danger Zone</h3>
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <h4>Delete Account</h4>
+                      <p>Permanently delete your account and all associated data</p>
+                    </div>
+                    <button class="btn btn-outline" style="border-color: var(--color-danger); color: var(--color-danger);">Delete Account</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PLATFORMS PANEL -->
+              <div data-settings-panel="platforms" class="hidden">
+                <div class="settings-section">
+                  <h3>🔗 Connected Platforms</h3>
+                  <p class="text-muted" style="margin-bottom: 1.25rem; font-size: 0.875rem;">Connect your social media accounts to start scheduling posts.</p>
+                  <div class="connected-platforms" id="platforms-list">
+
+                    <!-- Telegram -->
+                    <div class="platform-connection" id="platform-telegram">
+                      <div class="platform-icon telegram">✈️</div>
+                      <div class="platform-connection-info">
+                        <h4>Telegram</h4>
+                        <p class="platform-status-text">Connected as @johndoe_channel</p>
+                      </div>
+                      <span class="badge badge-success platform-badge">✓ Connected</span>
+                      <button class="btn btn-outline platform-action-btn" style="margin-left: auto;" data-action="disconnect" data-platform="telegram">Disconnect</button>
+                    </div>
+
+                    <!-- Instagram -->
+                    <div class="platform-connection" id="platform-instagram">
+                      <div class="platform-icon instagram">📷</div>
+                      <div class="platform-connection-info">
+                        <h4>Instagram</h4>
+                        <p class="platform-status-text">Connected as @johndoe</p>
+                      </div>
+                      <span class="badge badge-success platform-badge">✓ Connected</span>
+                      <button class="btn btn-outline platform-action-btn" style="margin-left: auto;" data-action="disconnect" data-platform="instagram">Disconnect</button>
+                    </div>
+
+                    <!-- Facebook -->
+                    <div class="platform-connection" id="platform-facebook" style="opacity:0.65;">
+                      <div class="platform-icon facebook">🔵</div>
+                      <div class="platform-connection-info">
+                        <h4>Facebook</h4>
+                        <p class="platform-status-text">Not connected</p>
+                      </div>
+                      <button class="btn btn-primary platform-action-btn" style="margin-left: auto;" data-action="connect" data-platform="facebook">Connect</button>
+                    </div>
+
+                    <!-- Twitter / X -->
+                    <div class="platform-connection" id="platform-twitter" style="opacity:0.65;">
+                      <div class="platform-icon twitter">🐦</div>
+                      <div class="platform-connection-info">
+                        <h4>Twitter / X</h4>
+                        <p class="platform-status-text">Not connected</p>
+                      </div>
+                      <button class="btn btn-primary platform-action-btn" style="margin-left: auto;" data-action="connect" data-platform="twitter">Connect</button>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <!-- NOTIFICATIONS PANEL -->
+              <div data-settings-panel="notifications" class="hidden">
+                <div class="settings-section">
+                  <h3>🔔 Notification Preferences</h3>
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <h4>Post Published</h4>
+                      <p>Get notified when your scheduled post goes live</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <h4>Weekly Email Digest</h4>
+                      <p>Receive a weekly summary of your social performance</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <h4>Security Alerts</h4>
+                      <p>Get notified about suspicious login attempts</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <h4>Browser Push Notifications</h4>
+                      <p>Allow browser notifications for real-time updates</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- ========================================
+       CONNECT ACCOUNT MODAL  (gramir.uz style)
+       ======================================== -->
+  <div id="connect-modal" class="modal-overlay hidden">
+    <div class="modal dark-modal">
+
+      <!-- STEP 1: Platform picker -->
+      <div id="modal-step-picker">
+        <div class="dark-modal-header">
+          <h3 class="dark-modal-title">Hisob ulash</h3>
+          <button class="dark-close-btn" id="modal-close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="dark-modal-body">
+          <div class="picker-search-wrap">
+            <svg class="picker-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="17" height="17"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="platform-search" class="picker-search-input" placeholder="Qidirish...">
+          </div>
+          <div class="platform-picker-grid" id="platform-picker-grid"></div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Platform detail -->
+      <div id="modal-step-detail" class="hidden">
+        <div class="dark-modal-header">
+          <button class="dark-back-btn" id="modal-back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="detail-header-meta">
+            <div class="detail-icon-el" id="detail-icon-el"></div>
+            <div>
+              <h4 class="detail-platform-name" id="detail-name-el"></h4>
+              <p class="detail-platform-tagline" id="detail-tagline-el"></p>
+            </div>
+          </div>
+          <button class="dark-close-btn" id="modal-close-2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="dark-modal-body">
+          <div class="oauth-steps-card">
+            <ol class="oauth-steps-list" id="detail-steps-el"></ol>
+          </div>
+          <!-- Telegram Login Widget mounts here when platform === telegram -->
+          <div id="telegram-widget-slot" class="telegram-widget-slot hidden"></div>
+          <p id="detail-config-warn" class="detail-config-warn hidden"></p>
+        </div>
+        <div class="dark-modal-footer">
+          <button class="platform-oauth-btn" id="detail-connect-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="17" height="17"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span id="detail-connect-text">Ulash</span>
+          </button>
+          <p class="platform-redirect-note">Tashqi sahifaga yo'naltirilasiz</p>
+        </div>
+      </div>
+
+      <!-- STEP 3: Loading -->
+      <div id="modal-step-loading" class="hidden">
+        <div class="dark-modal-body dark-center-body">
+          <div class="dark-spinner"></div>
+          <p class="dark-loading-title" id="modal-loading-title">Ulanmoqda...</p>
+          <p class="dark-loading-sub" id="modal-loading-sub">Iltimos kuting</p>
+        </div>
+      </div>
+
+      <!-- STEP 4: Success -->
+      <div id="modal-step-success" class="hidden">
+        <div class="dark-modal-body dark-center-body">
+          <div class="dark-success-icon">✅</div>
+          <h4 class="dark-success-title" id="modal-success-title"></h4>
+          <p class="dark-success-sub" id="modal-success-sub"></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <!-- OAuth credentials (fill in oauth-config.js) -->
+  <script src="oauth-config.js"></script>
+
+  <!-- Facebook JS SDK (initialised at runtime by app.js if FACEBOOK_APP_ID is set) -->
+  <div id="fb-root"></div>
+
+  <!-- Telegram Login Widget callback (called by Telegram's iframe after user authorises) -->
+  <script>
+    window.onTelegramAuth = function (user) {
+      // user = { id, first_name, last_name, username, photo_url, auth_date, hash }
+      if (typeof window.handleTelegramAuth === 'function') window.handleTelegramAuth(user);
+    };
+  </script>
+
+  <script src="app.js"></script>
+</body>
+</html>
