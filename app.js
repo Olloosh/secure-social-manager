@@ -148,42 +148,120 @@ document.getElementById('go-to-login')?.addEventListener('click', (e) => {
 });
 
 // ========================================
-// Login Form
+// Auth Storage (localStorage, SHA-256 hashed passwords)
 // ========================================
-document.getElementById('login-form')?.addEventListener('submit', (e) => {
-  e.preventDefault();
+const USERS_KEY = 'ssm_users';
 
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-password').value;
+async function sha256(str) {
+  const buf = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+function loadUsers() { return JSON.parse(localStorage.getItem(USERS_KEY) || '{}'); }
+function saveUsers(u) { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
 
-  if (email && password) {
-    const rawName     = email.split('@')[0];
-    const displayName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
-
-    addAndSwitchAccount(displayName, email);
-    showPage('app');
-    showSection('dashboard');
+// Form-level error UI helpers
+function shakeForm(formId) {
+  const f = document.getElementById(formId);
+  if (!f) return;
+  f.classList.remove('form-shake');
+  void f.offsetWidth;                // restart animation
+  f.classList.add('form-shake');
+}
+function setFieldError(inputId, msg) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  input.closest('.form-group')?.classList.add('has-error');
+  let err = input.closest('.form-group')?.querySelector('.field-error');
+  if (!err) {
+    err = document.createElement('div');
+    err.className = 'field-error';
+    input.closest('.form-group')?.appendChild(err);
   }
+  err.textContent = msg;
+}
+function clearFieldErrors(formId) {
+  document.querySelectorAll(`#${formId} .form-group.has-error`).forEach(g => {
+    g.classList.remove('has-error');
+    g.querySelector('.field-error')?.remove();
+  });
+}
+
+// ========================================
+// Login Form — verifies against registered users
+// ========================================
+document.getElementById('login-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearFieldErrors('login-form');
+
+  const email    = document.getElementById('login-email').value.trim().toLowerCase();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) return;
+
+  const users = loadUsers();
+  const user  = users[email];
+
+  if (!user) {
+    setFieldError('login-email', 'Bu email bilan ro\'yxatdan o\'tilmagan');
+    shakeForm('login-form');
+    showToast('Avval ro\'yxatdan o\'ting', 'error');
+    return;
+  }
+
+  const hash = await sha256(password);
+  if (hash !== user.passwordHash) {
+    setFieldError('login-password', 'Parol noto\'g\'ri');
+    shakeForm('login-form');
+    showToast('Email yoki parol noto\'g\'ri', 'error');
+    return;
+  }
+
+  addAndSwitchAccount(user.name, email);
+  showPage('app');
+  showSection('dashboard');
+  showToast(`Xush kelibsiz, ${user.name.split(' ')[0]}!`, 'success');
 });
 
 // ========================================
-// Register Form
+// Register Form — creates account, rejects duplicates
 // ========================================
-document.getElementById('register-form')?.addEventListener('submit', (e) => {
+document.getElementById('register-form')?.addEventListener('submit', async (e) => {
   e.preventDefault();
+  clearFieldErrors('register-form');
 
-  const name     = document.getElementById('register-name').value;
-  const email    = document.getElementById('register-email').value;
+  const name     = document.getElementById('register-name').value.trim();
+  const email    = document.getElementById('register-email').value.trim().toLowerCase();
   const password = document.getElementById('register-password').value;
+  if (!email || !password) return;
 
-  if (email && password) {
-    const displayName   = name || email.split('@')[0];
-    const formattedName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
-
-    addAndSwitchAccount(formattedName, email);
-    showPage('app');
-    showSection('dashboard');
+  if (password.length < 6) {
+    setFieldError('register-password', 'Parol kamida 6 ta belgi bo\'lishi kerak');
+    shakeForm('register-form');
+    return;
   }
+
+  const users = loadUsers();
+  if (users[email]) {
+    setFieldError('register-email', 'Bu email allaqachon ro\'yxatdan o\'tgan');
+    shakeForm('register-form');
+    showToast('Email band — kirish tugmasini bosing', 'error');
+    return;
+  }
+
+  const displayName   = name || email.split('@')[0];
+  const formattedName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+
+  users[email] = {
+    name:         formattedName,
+    passwordHash: await sha256(password),
+    created_at:   Date.now(),
+  };
+  saveUsers(users);
+
+  addAndSwitchAccount(formattedName, email);
+  showPage('app');
+  showSection('dashboard');
+  showToast('Akkaunt yaratildi 🎉', 'success');
 });
 
 // Add new account or switch to existing, then update UI

@@ -2081,6 +2081,43 @@ h6 { font-size: var(--font-size-base); }
   color: rgba(255,255,255,0.3);
 }
 
+/* Auth form — error state + shake animation */
+.form-group.has-error .form-input {
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.04);
+}
+.form-group.has-error .input-icon { color: #ef4444; }
+.field-error {
+  margin-top: 0.4rem;
+  color: #ef4444;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  animation: field-error-fade 0.25s ease;
+}
+.field-error::before { content: '⚠'; font-size: 0.9em; }
+@keyframes field-error-fade {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.form-shake { animation: form-shake 0.45s cubic-bezier(.36,.07,.19,.97) both; }
+@keyframes form-shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-8px); }
+  40%, 60% { transform: translateX(8px); }
+}
+
+/* Auth card entrance */
+.auth-card { animation: auth-in 0.55s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes auth-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 /* Telegram Login Widget slot */
 .telegram-widget-slot {
   display: flex;
