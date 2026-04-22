@@ -29,16 +29,19 @@ function showToast(message, type = 'info', duration = 3000) {
 // DOM Elements
 // ========================================
 const pages = {
-  login: document.getElementById('page-login'),
-  register: document.getElementById('page-register'),
-  app: document.getElementById('app-layout')
+  login:         document.getElementById('page-login'),
+  register:      document.getElementById('page-register'),
+  '2fa-setup':   document.getElementById('page-2fa-setup'),
+  '2fa-verify':  document.getElementById('page-2fa-verify'),
+  app:           document.getElementById('app-layout')
 };
 
 const sections = {
-  dashboard: document.getElementById('section-dashboard'),
-  'create-post': document.getElementById('section-create-post'),
-  analytics: document.getElementById('section-analytics'),
-  settings: document.getElementById('section-settings')
+  dashboard:    document.getElementById('section-dashboard'),
+  'create-post':document.getElementById('section-create-post'),
+  analytics:    document.getElementById('section-analytics'),
+  settings:     document.getElementById('section-settings'),
+  admin:        document.getElementById('section-admin')
 };
 
 const pageTitle = document.getElementById('page-title');
@@ -195,6 +198,11 @@ function clearFieldErrors(formId) {
 }
 
 // ========================================
+// 2FA pending login state (between password-OK and passphrase-OK)
+// ========================================
+let pending2FAEmail = null;
+
+// ========================================
 // Login Form — verifies against registered users
 // ========================================
 document.getElementById('login-form')?.addEventListener('submit', async (e) => {
@@ -223,6 +231,18 @@ document.getElementById('login-form')?.addEventListener('submit', async (e) => {
     return;
   }
 
+  // If user has 2FA set, go to verify page
+  if (user.passphraseHash) {
+    pending2FAEmail = email;
+    document.getElementById('twofa-verify-pass').value = '';
+    document.getElementById('twofa-hint-box').classList.add('hidden');
+    document.getElementById('twofa-show-hint').style.display = '';
+    showPage('2fa-verify');
+    setTimeout(() => document.getElementById('twofa-verify-pass').focus(), 100);
+    return;
+  }
+
+  // No 2FA — go straight to app
   addAndSwitchAccount(user.name, email);
   showPage('app');
   showSection('dashboard');
@@ -265,10 +285,116 @@ document.getElementById('register-form')?.addEventListener('submit', async (e) =
   };
   saveUsers(users);
 
-  addAndSwitchAccount(formattedName, email);
+  // Go to 2FA setup instead of dashboard directly
+  pending2FAEmail = email;
+  document.getElementById('twofa-pass').value = '';
+  document.getElementById('twofa-hint').value = '';
+  showPage('2fa-setup');
+  showToast('Akkaunt yaratildi — endi 2FA sozlang', 'success');
+});
+
+// ========================================
+// 2FA Setup Form — save passphrase + hint
+// ========================================
+document.getElementById('twofa-setup-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearFieldErrors('twofa-setup-form');
+
+  const passphrase = document.getElementById('twofa-pass').value;
+  const hint       = document.getElementById('twofa-hint').value.trim();
+
+  if (passphrase.length < 4) {
+    setFieldError('twofa-pass', 'Kamida 4 ta belgi');
+    shakeForm('twofa-setup-form');
+    return;
+  }
+  if (!hint) {
+    setFieldError('twofa-hint', 'Kalit so\'z kerak');
+    shakeForm('twofa-setup-form');
+    return;
+  }
+  if (!pending2FAEmail) {
+    showPage('login');
+    return;
+  }
+
+  const users = loadUsers();
+  const user  = users[pending2FAEmail];
+  if (!user) {
+    showPage('login');
+    return;
+  }
+
+  user.passphraseHash = await sha256(passphrase);
+  user.passphraseHint = hint;    // plain text — just a reminder
+  saveUsers(users);
+
+  addAndSwitchAccount(user.name, pending2FAEmail);
+  pending2FAEmail = null;
   showPage('app');
   showSection('dashboard');
-  showToast('Akkaunt yaratildi 🎉', 'success');
+  showToast('2FA yoqildi — akkaunt himoyalangan 🛡️', 'success');
+});
+
+// ========================================
+// 2FA Verify Form — check passphrase
+// ========================================
+document.getElementById('twofa-verify-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearFieldErrors('twofa-verify-form');
+
+  if (!pending2FAEmail) {
+    showPage('login');
+    return;
+  }
+
+  const passphrase = document.getElementById('twofa-verify-pass').value;
+  const users = loadUsers();
+  const user  = users[pending2FAEmail];
+  if (!user || !user.passphraseHash) {
+    pending2FAEmail = null;
+    showPage('login');
+    return;
+  }
+
+  const hash = await sha256(passphrase);
+  if (hash !== user.passphraseHash) {
+    setFieldError('twofa-verify-pass', 'Parol noto\'g\'ri — login sahifasiga qaytasiz');
+    shakeForm('twofa-verify-form');
+    showToast('Qo\'shimcha parol noto\'g\'ri', 'error');
+    // Kick back to login after short delay
+    setTimeout(() => {
+      pending2FAEmail = null;
+      document.getElementById('login-form')?.reset();
+      showPage('login');
+    }, 1400);
+    return;
+  }
+
+  addAndSwitchAccount(user.name, pending2FAEmail);
+  const name = user.name;
+  pending2FAEmail = null;
+  showPage('app');
+  showSection('dashboard');
+  showToast(`Xush kelibsiz, ${name.split(' ')[0]}!`, 'success');
+});
+
+// Show hint
+document.getElementById('twofa-show-hint')?.addEventListener('click', () => {
+  if (!pending2FAEmail) return;
+  const users = loadUsers();
+  const user  = users[pending2FAEmail];
+  if (!user) return;
+  document.getElementById('twofa-hint-value').textContent = user.passphraseHint || '(kalit so\'z yo\'q)';
+  document.getElementById('twofa-hint-box').classList.remove('hidden');
+  document.getElementById('twofa-show-hint').style.display = 'none';
+});
+
+// Cancel button
+document.getElementById('twofa-cancel')?.addEventListener('click', () => {
+  pending2FAEmail = null;
+  document.getElementById('login-form')?.reset();
+  showPage('login');
 });
 
 // Add new account or switch to existing, then update UI
@@ -979,13 +1105,15 @@ async function seedAdmin() {
   const users = loadUsers();
   if (!users[ADMIN_EMAIL]) {
     users[ADMIN_EMAIL] = {
-      name:         'Admin',
-      passwordHash: await sha256(ADMIN_PASSWORD),
-      created_at:   Date.now(),
-      role:         'admin',
+      name:           'Admin',
+      passwordHash:   await sha256(ADMIN_PASSWORD),
+      passphraseHash: await sha256('secureadmin'),
+      passphraseHint: 'tizim boshlig\'ining maxsus so\'zi',
+      created_at:     Date.now(),
+      role:           'admin',
     };
     saveUsers(users);
-    console.log(`🛡 Admin seeded: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`);
+    console.log(`🛡 Admin seeded: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}  (2FA: secureadmin)`);
   }
 }
 

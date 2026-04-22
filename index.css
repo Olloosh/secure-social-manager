@@ -2276,6 +2276,50 @@ h6 { font-size: var(--font-size-base); }
   border-color: #fecaca;
 }
 
+/* 2FA — hint box + hint reveal button */
+.form-hint {
+  margin: 0.3rem 0 0;
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+.twofa-hint-box {
+  margin: 0.5rem 0 0.6rem;
+  padding: 0.7rem 0.9rem;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  animation: hint-fade 0.3s ease;
+}
+@keyframes hint-fade {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.twofa-hint-label { font-weight: 600; color: #92400e; margin-right: 0.4rem; }
+.twofa-hint-value { color: #78350f; }
+.twofa-hint-btn {
+  background: transparent;
+  border: 1px dashed #d1d5db;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  color: #6366F1;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.15s;
+}
+.twofa-hint-btn:hover {
+  background: #f5f3ff;
+  border-color: #6366F1;
+}
+.btn-ghost {
+  background: transparent;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+}
+.btn-ghost:hover { background: #f9fafb; color: #111; }
+
 /* Auth form — error state + shake animation */
 .form-group.has-error .form-input {
   border-color: #ef4444 !important;
