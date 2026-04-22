@@ -57,12 +57,43 @@ function showPage(pageName) {
   }
 }
 
+function formatCount(n, useK) {
+  if (useK && n >= 1000) {
+    const k = n / 1000;
+    return (k % 1 === 0 ? k.toFixed(0) : k.toFixed(1)) + 'K';
+  }
+  return Math.round(n).toString();
+}
+
+function animateCount(el) {
+  const target = parseFloat(el.dataset.count);
+  if (isNaN(target)) return;
+  const useK = el.dataset.format === 'k' || target >= 1000;
+  const duration = 1200;
+  const start = performance.now();
+  function step(now) {
+    const t = Math.min(1, (now - start) / duration);
+    const e = 1 - Math.pow(1 - t, 3); // easeOutCubic
+    el.textContent = formatCount(target * e, useK);
+    if (t < 1) requestAnimationFrame(step);
+    else el.textContent = formatCount(target, useK);
+  }
+  el.textContent = formatCount(0, useK);
+  requestAnimationFrame(step);
+}
+
+function runCountersIn(section) {
+  if (!section) return;
+  section.querySelectorAll('[data-count]').forEach(animateCount);
+}
+
 function showSection(sectionName) {
   Object.values(sections).forEach(section => section.classList.add('hidden'));
 
   const section = sections[sectionName];
   if (section) {
     section.classList.remove('hidden');
+    runCountersIn(section);
   }
 
   // Update active nav item
