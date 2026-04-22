@@ -201,6 +201,24 @@ async function sha256(str) {
 function loadUsers() { return JSON.parse(localStorage.getItem(USERS_KEY) || '{}'); }
 function saveUsers(u) { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
 
+// Session persistence:
+//   - sessionStorage → survives reload, dies on tab close
+//   - localStorage   → survives tab close too (used when "Remember me" is on)
+const SESSION_KEY = 'ssm_session';
+function setSession(email, remember) {
+  const store = remember ? localStorage : sessionStorage;
+  const other = remember ? sessionStorage : localStorage;
+  store.setItem(SESSION_KEY, email);
+  other.removeItem(SESSION_KEY);
+}
+function getSession() {
+  return sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY) || null;
+}
+function clearSession() {
+  sessionStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(SESSION_KEY);
+}
+
 // Form-level error UI helpers
 function shakeForm(formId) {
   const f = document.getElementById(formId);
@@ -274,6 +292,8 @@ document.getElementById('login-form')?.addEventListener('submit', async (e) => {
   }
 
   // No 2FA — go straight to app
+  const remember = document.getElementById('remember-me')?.checked;
+  setSession(email, !!remember);
   addAndSwitchAccount(user.name, email);
   showPage('app');
   showSection('dashboard');
@@ -360,6 +380,8 @@ document.getElementById('twofa-setup-form')?.addEventListener('submit', async (e
   user.passphraseHint = hint;    // plain text — just a reminder
   saveUsers(users);
 
+  const remember = document.getElementById('remember-me')?.checked;
+  setSession(pending2FAEmail, !!remember);
   addAndSwitchAccount(user.name, pending2FAEmail);
   pending2FAEmail = null;
   showPage('app');
@@ -402,6 +424,8 @@ document.getElementById('twofa-verify-form')?.addEventListener('submit', async (
     return;
   }
 
+  const remember = document.getElementById('remember-me')?.checked;
+  setSession(pending2FAEmail, !!remember);
   addAndSwitchAccount(user.name, pending2FAEmail);
   const name = user.name;
   pending2FAEmail = null;
@@ -477,6 +501,7 @@ document.querySelectorAll('.nav-item[data-page]').forEach(item => {
 // Logout
 // ========================================
 document.getElementById('logout-btn')?.addEventListener('click', () => {
+  clearSession();
   showPage('login');
 
   // Reset forms
@@ -1274,7 +1299,18 @@ window.addAndSwitchAccount = function (...args) {
 document.addEventListener('DOMContentLoaded', async () => {
   await seedAdmin();
   refreshAdminNav();
-  showPage('login');
+
+  // Auto-login if a session exists and user is still registered
+  const sessionEmail = getSession();
+  const users = loadUsers();
+  if (sessionEmail && users[sessionEmail]) {
+    addAndSwitchAccount(users[sessionEmail].name, sessionEmail);
+    showPage('app');
+    showSection('dashboard');
+  } else {
+    clearSession();
+    showPage('login');
+  }
 
   console.log('🔐 Secure Social Manager initialized');
   console.log(`🛡 Admin login: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`);
