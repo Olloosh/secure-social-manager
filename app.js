@@ -204,7 +204,6 @@ function saveUsers(u) { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
 // Session persistence:
 //   - sessionStorage → survives reload, dies on tab close
 //   - localStorage   → survives tab close too (used when "Remember me" is on)
-const SESSION_KEY = 'ssm_session';
 function setSession(email, remember) {
   const store = remember ? localStorage : sessionStorage;
   const other = remember ? sessionStorage : localStorage;
