@@ -340,7 +340,7 @@
             <div class="card stat-card">
               <div class="stat-icon success">🔗</div>
               <div class="stat-content">
-                <h3 data-count="2">0</h3>
+                <h3 data-count="0">0</h3>
                 <p>Platforms Connected</p>
               </div>
             </div>
@@ -800,25 +800,23 @@
                   <div class="connected-platforms" id="platforms-list">
 
                     <!-- Telegram -->
-                    <div class="platform-connection" id="platform-telegram">
+                    <div class="platform-connection" id="platform-telegram" style="opacity:0.65;">
                       <div class="platform-icon telegram">✈️</div>
                       <div class="platform-connection-info">
                         <h4>Telegram</h4>
-                        <p class="platform-status-text">Connected as @johndoe_channel</p>
+                        <p class="platform-status-text">Not connected</p>
                       </div>
-                      <span class="badge badge-success platform-badge">✓ Connected</span>
-                      <button class="btn btn-outline platform-action-btn" style="margin-left: auto;" data-action="disconnect" data-platform="telegram">Disconnect</button>
+                      <button class="btn btn-primary platform-action-btn" style="margin-left: auto;" data-action="connect" data-platform="telegram">Connect</button>
                     </div>
 
                     <!-- Instagram -->
-                    <div class="platform-connection" id="platform-instagram">
+                    <div class="platform-connection" id="platform-instagram" style="opacity:0.65;">
                       <div class="platform-icon instagram">📷</div>
                       <div class="platform-connection-info">
                         <h4>Instagram</h4>
-                        <p class="platform-status-text">Connected as @johndoe</p>
+                        <p class="platform-status-text">Not connected</p>
                       </div>
-                      <span class="badge badge-success platform-badge">✓ Connected</span>
-                      <button class="btn btn-outline platform-action-btn" style="margin-left: auto;" data-action="disconnect" data-platform="instagram">Disconnect</button>
+                      <button class="btn btn-primary platform-action-btn" style="margin-left: auto;" data-action="connect" data-platform="instagram">Connect</button>
                     </div>
 
                     <!-- Facebook -->

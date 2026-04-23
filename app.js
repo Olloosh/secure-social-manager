@@ -695,7 +695,7 @@ const oauthSteps = [
   'Avtomatik qaytarilasiz',
 ];
 
-const connectedSet = new Set(['telegram', 'instagram']);
+const connectedSet = new Set();
 let currentPlatform   = null;
 let fromSettings      = false;
 
