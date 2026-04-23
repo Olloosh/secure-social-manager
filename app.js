@@ -206,17 +206,31 @@ function saveUsers(u) { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
 //   - sessionStorage → survives reload, dies on tab close
 //   - localStorage   → survives tab close too (used when "Remember me" is on)
 function setSession(email, remember) {
-  const store = remember ? localStorage : sessionStorage;
-  const other = remember ? sessionStorage : localStorage;
-  store.setItem(SESSION_KEY, email);
-  other.removeItem(SESSION_KEY);
+  // Always persist to localStorage so reloads in same tab keep the session.
+  // A sessionStorage "alive" flag lets us detect a brand-new tab and wipe
+  // the session there when "remember me" was NOT ticked.
+  localStorage.setItem(SESSION_KEY, email);
+  localStorage.setItem(SESSION_KEY + '_remember', remember ? '1' : '0');
+  sessionStorage.setItem(SESSION_KEY + '_alive', '1');
 }
 function getSession() {
-  return sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY) || null;
+  const email = localStorage.getItem(SESSION_KEY);
+  if (!email) return null;
+  const remember = localStorage.getItem(SESSION_KEY + '_remember') === '1';
+  const alive    = sessionStorage.getItem(SESSION_KEY + '_alive') === '1';
+  if (!remember && !alive) {
+    // Fresh tab, user didn't tick "remember me" — drop session
+    clearSession();
+    return null;
+  }
+  // Re-arm alive flag for this tab so subsequent reloads keep working
+  sessionStorage.setItem(SESSION_KEY + '_alive', '1');
+  return email;
 }
 function clearSession() {
-  sessionStorage.removeItem(SESSION_KEY);
   localStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(SESSION_KEY + '_remember');
+  sessionStorage.removeItem(SESSION_KEY + '_alive');
 }
 
 // Form-level error UI helpers
@@ -644,7 +658,8 @@ function renderPosts() {
     return;
   }
   list.innerHTML = posts.map(p => {
-    const icon  = p.platform === 'telegram' ? '✈️' : p.platform === 'instagram' ? '📷' : p.platform === 'facebook' ? '📘' : '🌐';
+    const iconColor = p.platform === 'telegram' ? '0088CC' : p.platform === 'instagram' ? 'E4405F' : p.platform === 'facebook' ? '1877F2' : '999999';
+    const icon = `<img src="https://cdn.simpleicons.org/${p.platform}/${iconColor}" alt="${p.platform}" style="width:24px;height:24px;">`;
     const statusBadge = p.status === 'published'
       ? '<span class="badge badge-success">✓ Yuklandi</span>'
       : p.status === 'failed'
@@ -912,9 +927,9 @@ document.getElementById('save-account-btn')?.addEventListener('click', () => {
 // Platform Connect — gramir.uz style
 // ========================================
 const allPlatforms = [
-  { id: 'telegram',  name: 'Telegram',  icon: '✈️', iconBg: '#29B6F6',                                                              tagline: 'Kanal va guruhlaringizni ulang',           btnColor: '#29B6F6',                                         btnText: 'Telegram hisobini ulash'  },
-  { id: 'instagram', name: 'Instagram', icon: '📷', iconBg: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)',       tagline: 'Instagram biznes hisobingizni ulang',      btnColor: 'linear-gradient(135deg,#e6683c,#cc2366)',          btnText: 'Instagram hisobini ulash' },
-  { id: 'facebook',  name: 'Facebook',  icon: 'f',  iconBg: '#1877F2',                                                              tagline: 'Facebook sahifangizni ulang',              btnColor: '#1877F2',                                         btnText: 'Facebook hisobini ulash'  },
+  { id: 'telegram',  name: 'Telegram',  icon: '<img src="https://cdn.simpleicons.org/telegram/ffffff" alt="Telegram" style="width:60%;height:60%;">', iconBg: '#29B6F6', tagline: 'Kanal va guruhlaringizni ulang', btnColor: '#29B6F6', btnText: 'Telegram hisobini ulash'  },
+  { id: 'instagram', name: 'Instagram', icon: '<img src="https://cdn.simpleicons.org/instagram/ffffff" alt="Instagram" style="width:60%;height:60%;">', iconBg: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', tagline: 'Instagram biznes hisobingizni ulang', btnColor: 'linear-gradient(135deg,#e6683c,#cc2366)', btnText: 'Instagram hisobini ulash' },
+  { id: 'facebook',  name: 'Facebook',  icon: '<img src="https://cdn.simpleicons.org/facebook/ffffff" alt="Facebook" style="width:60%;height:60%;">', iconBg: '#1877F2', tagline: 'Facebook sahifangizni ulang', btnColor: '#1877F2', btnText: 'Facebook hisobini ulash'  },
   { id: 'linkedin',  name: 'LinkedIn',  icon: 'in', iconBg: '#0A66C2',                                                              tagline: 'LinkedIn kompaniya sahifangizni ulang',    btnColor: '#0A66C2',                                         btnText: 'LinkedIn hisobini ulash'  },
   { id: 'youtube',   name: 'YouTube',   icon: '▶',  iconBg: '#FF0000',                                                              tagline: 'YouTube kanalingizni ulang',               btnColor: '#FF0000',                                         btnText: 'YouTube hisobini ulash'   },
   { id: 'twitter',   name: 'X',         icon: '✕',  iconBg: '#111',                                                                  tagline: 'X (Twitter) hisobingizni ulang',           btnColor: '#111',                                            btnText: 'X hisobini ulash'         },
@@ -982,7 +997,7 @@ function showPlatformDetail(platformId) {
   currentPlatform = platformId;
 
   const iconEl = document.getElementById('detail-icon-el');
-  iconEl.textContent   = p.icon;
+  iconEl.innerHTML     = p.icon;
   iconEl.style.cssText = `background:${p.iconBg}; width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:700; color:#fff; flex-shrink:0;`;
 
   document.getElementById('detail-name-el').textContent    = p.name;
