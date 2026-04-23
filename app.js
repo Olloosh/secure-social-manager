@@ -654,8 +654,31 @@ settingsNavItems.forEach(item => {
     const panel = item.dataset.settings;
     document.querySelectorAll('[data-settings-panel]').forEach(p => p.classList.add('hidden'));
     document.querySelector(`[data-settings-panel="${panel}"]`)?.classList.remove('hidden');
+
+    if (panel === 'account') populateAccountForm();
   });
 });
+
+// Populate Account form with the logged-in user's data
+function populateAccountForm() {
+  const email = getSession();
+  if (!email) return;
+  const users = loadUsers();
+  const user  = users[email];
+  if (!user) return;
+
+  const nameEl     = document.getElementById('account-name');
+  const emailEl    = document.getElementById('account-email');
+  const userEl     = document.getElementById('account-username');
+  const birthdayEl = document.getElementById('account-birthday');
+  const genderEl   = document.getElementById('account-gender');
+
+  if (nameEl)     nameEl.value     = user.name || '';
+  if (emailEl)    emailEl.value    = email;
+  if (userEl)     userEl.value     = user.username || '@' + email.split('@')[0];
+  if (birthdayEl) birthdayEl.value = user.birthday || '';
+  if (genderEl)   genderEl.value   = user.gender || '';
+}
 
 // 2FA Toggle
 const twoFactorToggle = document.getElementById('2fa-toggle');
@@ -669,9 +692,30 @@ document.getElementById('change-password-btn')?.addEventListener('click', () => 
   showToast('Password reset link sent to your email', 'info');
 });
 
-// Save Account button
+// Save Account button — persist to localStorage user record
 document.getElementById('save-account-btn')?.addEventListener('click', () => {
-  showToast('Account information saved!', 'success');
+  const email = getSession();
+  if (!email) { showToast('Avval login qiling', 'error'); return; }
+  const users = loadUsers();
+  const user  = users[email];
+  if (!user)  { showToast('Foydalanuvchi topilmadi', 'error'); return; }
+
+  const name     = document.getElementById('account-name').value.trim();
+  const username = document.getElementById('account-username').value.trim();
+  const birthday = document.getElementById('account-birthday').value;
+  const gender   = document.getElementById('account-gender').value;
+
+  if (!name) { showToast('Ism bo\'sh bo\'lmasligi kerak', 'error'); return; }
+
+  user.name     = name;
+  user.username = username;
+  user.birthday = birthday;
+  user.gender   = gender;
+  saveUsers(users);
+
+  // Refresh topbar + avatar
+  addAndSwitchAccount(user.name, email);
+  showToast('Ma\'lumotlar saqlandi ✓', 'success');
 });
 
 // ========================================

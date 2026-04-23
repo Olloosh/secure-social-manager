@@ -754,15 +754,28 @@
                   <h3>👤 Account Information</h3>
                   <div class="form-group">
                     <label class="form-label" for="account-name">Full Name</label>
-                    <input type="text" id="account-name" class="form-input" value="John Doe">
+                    <input type="text" id="account-name" class="form-input" placeholder="To'liq ism">
                   </div>
                   <div class="form-group">
                     <label class="form-label" for="account-email">Email Address</label>
-                    <input type="email" id="account-email" class="form-input" value="john@example.com">
+                    <input type="email" id="account-email" class="form-input" readonly>
                   </div>
                   <div class="form-group">
                     <label class="form-label" for="account-username">Username</label>
-                    <input type="text" id="account-username" class="form-input" value="@johndoe">
+                    <input type="text" id="account-username" class="form-input" placeholder="@username">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="account-birthday">Tug'ilgan kuni</label>
+                    <input type="date" id="account-birthday" class="form-input">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="account-gender">Jinsi</label>
+                    <select id="account-gender" class="form-input">
+                      <option value="">Tanlang…</option>
+                      <option value="male">Erkak</option>
+                      <option value="female">Ayol</option>
+                      <option value="other">Boshqa</option>
+                    </select>
                   </div>
                   <button class="btn btn-primary" id="save-account-btn">Save Changes</button>
                 </div>
