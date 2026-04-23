@@ -155,17 +155,17 @@ document.getElementById('register-password')?.addEventListener('input', (e) => {
 
   const config = [
     null,
-    { color: 'var(--color-danger)',  text: 'Weak' },
-    { color: 'var(--color-warning)', text: 'Fair' },
-    { color: '#3B82F6',              text: 'Good' },
-    { color: 'var(--color-success)', text: 'Strong' },
+    { color: 'var(--color-danger)',  text: 'Zaif' },
+    { color: 'var(--color-warning)', text: "O'rtacha" },
+    { color: '#3B82F6',              text: 'Yaxshi' },
+    { color: 'var(--color-success)', text: 'Kuchli' },
   ];
 
   bars.forEach((bar, i) => {
     bar.style.background = i < score ? config[score].color : 'var(--color-gray-200)';
   });
 
-  label.textContent = score ? `Password strength: ${config[score].text}` : '';
+  label.textContent = score ? `Parol kuchi: ${config[score].text}` : '';
   label.style.color = score ? config[score].color : 'var(--color-gray-500)';
 });
 
@@ -464,7 +464,7 @@ function addAndSwitchAccount(name, email) {
   } else {
     const color = colors[savedAccounts.length % colors.length];
     savedAccounts.forEach(a => a.active = false);
-    savedAccounts.push({ id: Date.now(), name, email, initials, color, role: 'Pro User', active: true });
+    savedAccounts.push({ id: Date.now(), name, email, initials, color, role: 'Pro foydalanuvchi', active: true });
   }
 
   const active = savedAccounts.find(a => a.active);
@@ -481,7 +481,7 @@ function addAndSwitchAccount(name, email) {
 
   const firstName = active.name.split(' ')[0];
   const welcomeEl = document.querySelector('#section-dashboard .welcome-section h1');
-  if (welcomeEl) welcomeEl.textContent = `Welcome back, ${firstName}! 👋`;
+  if (welcomeEl) welcomeEl.textContent = `Xush kelibsiz, ${firstName}! 👋`;
 }
 
 // ========================================
@@ -724,6 +724,20 @@ document.getElementById('create-post-form')?.addEventListener('submit', async (e
   const time     = document.getElementById('post-time').value;
   if (!content) { showToast('Matn bo\'sh bo\'lmasligi kerak', 'error'); return; }
 
+  // Must have at least one platform connected
+  if (connectedSet.size === 0) {
+    showToast('Avval account qo\'shing — Sozlamalar → Platformalar', 'error');
+    showSection('settings');
+    document.querySelector('.settings-nav-item[data-settings="platforms"]')?.click();
+    return;
+  }
+  if (!connectedSet.has(platform)) {
+    showToast(`${platform.charAt(0).toUpperCase() + platform.slice(1)} ulanmagan — avval uni ulang`, 'error');
+    showSection('settings');
+    document.querySelector('.settings-nav-item[data-settings="platforms"]')?.click();
+    return;
+  }
+
   const scheduledAt = date && time ? new Date(`${date}T${time}`).getTime() : null;
   const post = {
     id: String(Date.now()),
@@ -865,7 +879,7 @@ twoFactorToggle?.addEventListener('change', (e) => {
 
 // Change Password button
 document.getElementById('change-password-btn')?.addEventListener('click', () => {
-  showToast('Password reset link sent to your email', 'info');
+  showToast('Parolni tiklash havolasi emailingizga yuborildi', 'info');
 });
 
 // Save Account button — persist to localStorage user record
@@ -1225,14 +1239,14 @@ function connectPlatform(id) {
   const p   = allPlatforms.find(x => x.id === id);
   const row = document.getElementById(`platform-${id}`);
   if (row) {
-    row.querySelector('.platform-status-text').textContent = 'Connected';
+    row.querySelector('.platform-status-text').textContent = 'Ulangan';
     row.style.opacity = '1';
     row.querySelector('.platform-badge')?.remove();
     const btn = row.querySelector('.platform-action-btn');
     if (btn) btn.outerHTML = `
-      <span class="badge badge-success platform-badge">✓ Connected</span>
+      <span class="badge badge-success platform-badge">✓ Ulangan</span>
       <button class="btn btn-outline platform-action-btn" style="margin-left:auto;"
-        data-action="disconnect" data-platform="${id}">Disconnect</button>`;
+        data-action="disconnect" data-platform="${id}">Uzish</button>`;
   }
   updatePlatformCounter(+1);
   showToast(`${p?.name} muvaffaqiyatli ulandi!`, 'success');
@@ -1244,13 +1258,13 @@ function disconnectPlatform(id) {
   const p   = allPlatforms.find(x => x.id === id);
   const row = document.getElementById(`platform-${id}`);
   if (row) {
-    row.querySelector('.platform-status-text').textContent = 'Not connected';
+    row.querySelector('.platform-status-text').textContent = 'Ulanmagan';
     row.style.opacity = '0.65';
     row.querySelector('.platform-badge')?.remove();
     const btn = row.querySelector('.platform-action-btn');
     if (btn) btn.outerHTML = `
       <button class="btn btn-primary platform-action-btn" style="margin-left:auto;"
-        data-action="connect" data-platform="${id}">Connect</button>`;
+        data-action="connect" data-platform="${id}">Ulash</button>`;
   }
   updatePlatformCounter(-1);
   showToast(`${p?.name} ulanishi uzildi`, 'warning');
@@ -1258,7 +1272,7 @@ function disconnectPlatform(id) {
 
 function updatePlatformCounter(delta) {
   document.querySelectorAll('.stat-card .stat-content').forEach(card => {
-    if (card.querySelector('p')?.textContent === 'Platforms Connected') {
+    if (card.querySelector('p')?.textContent === 'Ulangan platformalar') {
       const h3 = card.querySelector('h3');
       h3.textContent = Math.max(0, parseInt(h3.textContent || 0) + delta);
     }
@@ -1284,11 +1298,7 @@ sidebarOverlay?.addEventListener('click', () => {
 // ========================================
 // Account Switcher
 // ========================================
-const savedAccounts = [
-  { id: 1, name: 'John Doe',       email: 'john@example.com',      initials: 'JD', color: '#6366F1', role: 'Pro User',       active: true  },
-  { id: 2, name: 'Marketing Team', email: 'marketing@company.com', initials: 'MT', color: '#10B981', role: 'Team Account',   active: false },
-  { id: 3, name: 'Brand Account',  email: 'brand@mystore.com',     initials: 'BA', color: '#F59E0B', role: 'Business',       active: false },
-];
+const savedAccounts = [];
 
 function renderAccountList() {
   const list = document.getElementById('account-list');
@@ -1333,7 +1343,7 @@ function switchAccount(id) {
   // Update welcome message
   const firstName = acc.name.split(' ')[0];
   const welcomeEl = document.querySelector('#section-dashboard .welcome-section h1');
-  if (welcomeEl) welcomeEl.textContent = `Welcome back, ${firstName}! 👋`;
+  if (welcomeEl) welcomeEl.textContent = `Xush kelibsiz, ${firstName}! 👋`;
 
   renderAccountList();
   closeAccountDropdown();
