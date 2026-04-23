@@ -94,6 +94,7 @@ function showSection(sectionName) {
   if (section) {
     section.classList.remove('hidden');
     runCountersIn(section);
+    if (sectionName === 'create-post') renderPosts();
   }
 
   // Update active nav item
@@ -573,9 +574,189 @@ if (postTime) {
   postTime.value = now.toTimeString().slice(0, 5);
 }
 
+// ────────────────────────────────────────────────────────────
+// Media upload preview
+// ────────────────────────────────────────────────────────────
+const MAX_MEDIA_BYTES = 5 * 1024 * 1024; // 5 MB
+let pendingMedia = null; // { type: 'image'|'video', dataUrl, name }
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+function resetMediaPreview() {
+  pendingMedia = null;
+  const box = document.getElementById('media-preview');
+  if (box) { box.innerHTML = ''; box.classList.add('hidden'); }
+  const input = document.getElementById('post-media');
+  if (input) input.value = '';
+}
+
+document.getElementById('post-media')?.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) { resetMediaPreview(); return; }
+  if (file.size > MAX_MEDIA_BYTES) {
+    showToast('Fayl 5 MB dan katta — kichikroqini tanlang', 'error');
+    resetMediaPreview();
+    return;
+  }
+  const type = file.type.startsWith('video') ? 'video' : 'image';
+  const dataUrl = await readFileAsDataURL(file);
+  pendingMedia = { type, dataUrl, name: file.name };
+
+  const box = document.getElementById('media-preview');
+  box.classList.remove('hidden');
+  box.innerHTML =
+    (type === 'video'
+      ? `<video src="${dataUrl}" controls></video>`
+      : `<img src="${dataUrl}" alt="preview">`) +
+    `<button type="button" class="media-remove">✕ Olib tashlash</button>`;
+  box.querySelector('.media-remove').addEventListener('click', resetMediaPreview);
+});
+
+// ────────────────────────────────────────────────────────────
+// Posts storage (per-user, localStorage)
+// ────────────────────────────────────────────────────────────
+const POSTS_KEY = 'ssm_posts';
+function loadPosts(email) {
+  const all = JSON.parse(localStorage.getItem(POSTS_KEY) || '{}');
+  return all[email] || [];
+}
+function savePosts(email, posts) {
+  const all = JSON.parse(localStorage.getItem(POSTS_KEY) || '{}');
+  all[email] = posts;
+  localStorage.setItem(POSTS_KEY, JSON.stringify(all));
+}
+
+function renderPosts() {
+  const email = getSession();
+  const list  = document.getElementById('posts-list');
+  const empty = document.getElementById('posts-empty');
+  if (!list) return;
+  const posts = email ? loadPosts(email) : [];
+  if (!posts.length) {
+    list.innerHTML = '<p class="text-muted" id="posts-empty">Hali post yoʻq — birinchi postingizni yarating 👆</p>';
+    return;
+  }
+  list.innerHTML = posts.map(p => {
+    const icon  = p.platform === 'telegram' ? '✈️' : p.platform === 'instagram' ? '📷' : p.platform === 'facebook' ? '📘' : '🌐';
+    const statusBadge = p.status === 'published'
+      ? '<span class="badge badge-success">✓ Yuklandi</span>'
+      : p.status === 'failed'
+        ? '<span class="badge badge-danger">✕ Xatolik</span>'
+        : '<span class="badge badge-primary">📅 Rejalashtirilgan</span>';
+    const media = !p.media ? '' :
+      p.media.type === 'video'
+        ? `<div class="post-media"><video src="${p.media.dataUrl}" controls></video></div>`
+        : `<div class="post-media"><img src="${p.media.dataUrl}" alt=""></div>`;
+    const when = p.scheduledAt
+      ? new Date(p.scheduledAt).toLocaleString()
+      : new Date(p.createdAt).toLocaleString();
+    return `
+      <div class="post-card" data-id="${p.id}">
+        ${media}
+        <div class="post-body">
+          <div class="post-meta">
+            <span>${icon} ${p.platform}</span>
+            <span>•</span>
+            <span>${when}</span>
+            ${statusBadge}
+            <button class="post-delete" data-id="${p.id}">🗑 O'chirish</button>
+          </div>
+          <p class="post-text">${(p.content || '').replace(/</g,'&lt;')}</p>
+          ${p.error ? `<p class="text-muted" style="color:var(--color-danger);font-size:0.8rem;margin:0;">${p.error}</p>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+document.getElementById('posts-list')?.addEventListener('click', (e) => {
+  const btn = e.target.closest('.post-delete');
+  if (!btn) return;
+  const email = getSession();
+  if (!email) return;
+  const posts = loadPosts(email).filter(p => p.id !== btn.dataset.id);
+  savePosts(email, posts);
+  renderPosts();
+  showToast('Post o\'chirildi', 'info');
+});
+
+// ────────────────────────────────────────────────────────────
+// Real Facebook post attempt (best-effort — requires publish scope)
+// ────────────────────────────────────────────────────────────
+async function tryPublishFacebook(content) {
+  const tok = getOAuth('facebook');
+  if (!tok || !tok.accessToken) {
+    throw new Error('Facebook ulangan emas — Settings → Platforms da ulang');
+  }
+  if (!window.FB) {
+    throw new Error('Facebook SDK hali yuklanmagan');
+  }
+  return new Promise((resolve, reject) => {
+    FB.api('/me/feed', 'POST',
+      { message: content, access_token: tok.accessToken },
+      (res) => {
+        if (!res || res.error) {
+          reject(new Error(res?.error?.message || 'Facebook xatolik'));
+        } else {
+          resolve(res);
+        }
+      }
+    );
+  });
+}
+
 // Schedule post form
-document.getElementById('create-post-form')?.addEventListener('submit', (e) => {
+document.getElementById('create-post-form')?.addEventListener('submit', async (e) => {
   e.preventDefault();
+
+  const email = getSession();
+  if (!email) { showToast('Avval login qiling', 'error'); return; }
+
+  const platform = document.querySelector('input[name="platform"]:checked')?.value || 'telegram';
+  const content  = document.getElementById('post-content').value.trim();
+  const date     = document.getElementById('post-date').value;
+  const time     = document.getElementById('post-time').value;
+  if (!content) { showToast('Matn bo\'sh bo\'lmasligi kerak', 'error'); return; }
+
+  const scheduledAt = date && time ? new Date(`${date}T${time}`).getTime() : null;
+  const post = {
+    id: String(Date.now()),
+    platform,
+    content,
+    media: pendingMedia,
+    scheduledAt,
+    createdAt: Date.now(),
+    status: 'scheduled',
+    error: null,
+  };
+
+  // Real Facebook attempt (only if user explicitly picked Facebook AND scheduled for now/past)
+  const postNow = !scheduledAt || scheduledAt <= Date.now() + 60_000;
+  if (platform === 'facebook' && postNow) {
+    try {
+      await tryPublishFacebook(content);
+      post.status = 'published';
+      showToast('Facebook ga yuborildi ✓', 'success');
+    } catch (err) {
+      post.status = 'failed';
+      post.error  = err.message;
+      showToast('Facebook xatolik: ' + err.message, 'error');
+    }
+  } else {
+    showToast(`Post ${new Date(scheduledAt || Date.now()).toLocaleString()} ga rejalashtirildi 📅`, 'success');
+  }
+
+  // Save locally
+  const posts = loadPosts(email);
+  posts.unshift(post);
+  savePosts(email, posts);
+  renderPosts();
 
   // Increment scheduled posts counter on dashboard
   const statCountEl = document.querySelector('.stat-card .stat-content h3');
@@ -584,18 +765,14 @@ document.getElementById('create-post-form')?.addEventListener('submit', (e) => {
     statCountEl.textContent = current + 1;
   }
 
-  showToast('Post scheduled successfully! 📅', 'success');
-
   // Show inline success message
-  scheduleSuccess.classList.add('show');
+  scheduleSuccess?.classList.add('show');
 
   // Reset form after delay
   setTimeout(() => {
     document.getElementById('create-post-form').reset();
-    previewText.textContent = 'Your post content will appear here...';
-    charCount.textContent = '0';
-
-    // Reset date and time
+    resetMediaPreview();
+    if (charCount) charCount.textContent = '0';
     if (postDate) {
       const today = new Date();
       const offset = today.getTimezoneOffset();
@@ -608,9 +785,8 @@ document.getElementById('create-post-form')?.addEventListener('submit', (e) => {
     }
   }, 2000);
 
-  // Hide success after delay
   setTimeout(() => {
-    scheduleSuccess.classList.remove('show');
+    scheduleSuccess?.classList.remove('show');
   }, 3000);
 });
 

@@ -465,6 +465,14 @@
                   <p class="form-hint"><span id="char-count">0</span>/2200 characters</p>
                 </div>
 
+                <!-- Media Upload -->
+                <div class="form-group">
+                  <label class="form-label" for="post-media">Rasm yoki video (ixtiyoriy)</label>
+                  <input type="file" id="post-media" class="form-input" accept="image/*,video/*">
+                  <p class="form-hint">Maks. 5 MB — rasm yoki qisqa video</p>
+                  <div id="media-preview" class="media-preview hidden"></div>
+                </div>
+
                 <!-- Date Time Picker -->
                 <div class="datetime-picker">
                   <div class="form-group">
@@ -495,6 +503,18 @@
                   <strong>Post scheduled successfully!</strong>
                   <p style="margin: 0; font-size: 0.875rem;">Your post will be published at the scheduled time.</p>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Posts History -->
+          <div class="card" style="margin-top: 1.5rem;">
+            <div class="card-header">
+              <h3>📬 Sizning postlaringiz</h3>
+            </div>
+            <div class="card-body">
+              <div id="posts-list" class="posts-list">
+                <p class="text-muted" id="posts-empty">Hali post yo'q — birinchi postingizni yarating 👆</p>
               </div>
             </div>
           </div>
