@@ -537,15 +537,15 @@ platformOptions.forEach(option => {
     option.classList.add('active');
 
     const platform = option.querySelector('input').value;
-    previewPlatform.textContent = `${platform.charAt(0).toUpperCase() + platform.slice(1)} • Scheduled`;
+    if (previewPlatform) previewPlatform.textContent = `${platform.charAt(0).toUpperCase() + platform.slice(1)} • Scheduled`;
   });
 });
 
 // Character count and preview
 postContent?.addEventListener('input', (e) => {
   const text = e.target.value;
-  charCount.textContent = text.length;
-  previewText.textContent = text || 'Your post content will appear here...';
+  if (charCount) charCount.textContent = text.length;
+  if (previewText) previewText.textContent = text || 'Your post content will appear here...';
 
   // Color change when approaching limit
   if (text.length > 2000) {
