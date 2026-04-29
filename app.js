@@ -182,6 +182,93 @@ document.getElementById('go-to-login')?.addEventListener('click', (e) => {
   showPage('login');
 });
 
+document.getElementById('go-to-forgot')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  forgotReset();
+  showPage('forgot');
+});
+
+document.getElementById('forgot-back-login')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  showPage('login');
+});
+
+// ========================================
+// Forgot Password — 3-step flow
+// ========================================
+let forgotEmail = null;
+
+function forgotReset() {
+  forgotEmail = null;
+  document.getElementById('forgot-email-form')?.reset();
+  document.getElementById('forgot-hint-form')?.reset();
+  document.getElementById('forgot-newpass-form')?.reset();
+  ['forgot-step-email', 'forgot-step-hint', 'forgot-step-newpass'].forEach((id, i) => {
+    document.getElementById(id)?.classList.toggle('hidden', i !== 0);
+  });
+}
+
+// Step 1 — check email exists
+document.getElementById('forgot-email-form')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const email = document.getElementById('forgot-email').value.trim().toLowerCase();
+  const users = loadUsers();
+  if (!users[email]) {
+    showToast('Bu email bilan akkaunt topilmadi', 'error');
+    return;
+  }
+  const user = users[email];
+  if (!user.passphraseHash) {
+    showToast('Bu akkauntda kalit so\'z o\'rnatilmagan — admin bilan bog\'laning', 'warning');
+    return;
+  }
+  forgotEmail = email;
+  const hint = user.passphraseHint || '(eslatma yo\'q)';
+  document.getElementById('forgot-hint-show').textContent = `💡 Eslatma: "${hint}"`;
+  document.getElementById('forgot-step-email').classList.add('hidden');
+  document.getElementById('forgot-step-hint').classList.remove('hidden');
+  document.getElementById('forgot-hint-input').focus();
+});
+
+// Step 2 — verify kalit so'z
+document.getElementById('forgot-hint-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!forgotEmail) { showPage('login'); return; }
+  const val   = document.getElementById('forgot-hint-input').value;
+  const users = loadUsers();
+  const user  = users[forgotEmail];
+  const hash  = await sha256(val);
+  if (hash !== user.passphraseHash) {
+    showToast('Kalit so\'z noto\'g\'ri', 'error');
+    document.getElementById('forgot-hint-input').value = '';
+    document.getElementById('forgot-hint-input').focus();
+    return;
+  }
+  document.getElementById('forgot-step-hint').classList.add('hidden');
+  document.getElementById('forgot-step-newpass').classList.remove('hidden');
+  document.getElementById('forgot-newpass').focus();
+});
+
+// Step 3 — set new password
+document.getElementById('forgot-newpass-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!forgotEmail) { showPage('login'); return; }
+  const p1 = document.getElementById('forgot-newpass').value;
+  const p2 = document.getElementById('forgot-newpass2').value;
+  if (p1.length < 8) {
+    showToast('Parol kamida 8 ta belgi bo\'lishi kerak', 'error'); return;
+  }
+  if (p1 !== p2) {
+    showToast('Parollar mos kelmaydi', 'error'); return;
+  }
+  const users = loadUsers();
+  users[forgotEmail].passwordHash = await sha256(p1);
+  saveUsers(users);
+  forgotEmail = null;
+  showToast('Parol muvaffaqiyatli yangilandi! Endi kiring.', 'success');
+  showPage('login');
+});
+
 // ========================================
 // Auth Storage (localStorage, SHA-256 hashed passwords)
 // ========================================
