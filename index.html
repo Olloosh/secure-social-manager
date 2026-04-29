@@ -337,6 +337,10 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
             <span>Statistika</span>
           </div>
+          <div class="nav-item" data-page="parser">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <span>Parser</span>
+          </div>
         </div>
 
         <div class="nav-section">
@@ -1010,6 +1014,52 @@
         <!-- ========================================
              ADMIN PANEL
              ======================================== -->
+        <!-- ========================================
+             PARSER PAGE
+             ======================================== -->
+        <section id="section-parser" class="page hidden">
+          <div class="welcome-section">
+            <h1>🔍 Parser</h1>
+            <p>Telegram kanal yoki sahifasidan postlarni import qiling.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <div class="form-group" style="display:flex;gap:0.75rem;align-items:flex-end;">
+                <div style="flex:1;">
+                  <label class="form-label" for="parser-channel">Telegram kanal username</label>
+                  <div class="input-group">
+                    <span class="input-icon">✈️</span>
+                    <input type="text" id="parser-channel" class="form-input" placeholder="@kanal_nomi yoki https://t.me/kanal_nomi">
+                  </div>
+                </div>
+                <button class="btn btn-primary" id="parser-fetch-btn" style="height:44px;white-space:nowrap;">
+                  Postlarni yuklash
+                </button>
+              </div>
+              <p class="form-hint">Faqat ochiq (public) kanallar ishlaydi</p>
+            </div>
+          </div>
+
+          <!-- Loading -->
+          <div id="parser-loading" class="hidden" style="text-align:center;padding:2rem;">
+            <div class="dark-spinner" style="margin:0 auto 1rem;border-color:var(--color-primary);border-top-color:transparent;"></div>
+            <p class="text-muted">Postlar yuklanmoqda...</p>
+          </div>
+
+          <!-- Error -->
+          <div id="parser-error" class="hidden" style="background:var(--color-danger-light,#FEF2F2);border:1px solid var(--color-danger);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-top:1rem;color:var(--color-danger);"></div>
+
+          <!-- Results -->
+          <div id="parser-results" class="hidden" style="margin-top:1rem;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+              <h3 id="parser-channel-title" style="margin:0;font-size:1.1rem;"></h3>
+              <span id="parser-count" class="badge badge-primary"></span>
+            </div>
+            <div id="parser-posts-list" style="display:flex;flex-direction:column;gap:1rem;"></div>
+          </div>
+        </section>
+
         <section id="section-admin" class="page hidden">
           <div class="welcome-section">
             <h1>🛡️ Admin paneli</h1>

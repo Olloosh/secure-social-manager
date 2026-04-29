@@ -42,6 +42,7 @@ const sections = {
   'create-post':document.getElementById('section-create-post'),
   analytics:    document.getElementById('section-analytics'),
   settings:     document.getElementById('section-settings'),
+  parser:       document.getElementById('section-parser'),
   admin:        document.getElementById('section-admin')
 };
 
@@ -108,10 +109,12 @@ function showSection(sectionName) {
 
   // Update page title
   const titles = {
-    dashboard: 'Dashboard',
-    'create-post': 'Create Post',
-    analytics: 'Analytics',
-    settings: 'Settings'
+    dashboard:    'Boshqaruv paneli',
+    'create-post':'Post yaratish',
+    analytics:    'Statistika',
+    settings:     'Sozlamalar',
+    parser:       'Parser',
+    admin:        'Admin paneli'
   };
 
   pageTitle.textContent = titles[sectionName] || 'Dashboard';
@@ -1788,6 +1791,127 @@ document.addEventListener('DOMContentLoaded', async () => {
     showToast(`${pendingConnect.charAt(0).toUpperCase() + pendingConnect.slice(1)} muvaffaqiyatli ulandi! ✓`, 'success');
   }
 
+  // ── Parser section ────────────────────────────────────
+  initParser();
+
   console.log('🔐 Secure Social Manager initialized');
   console.log(`🛡 Admin login: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`);
 });
+
+// ========================================
+// PARSER
+// ========================================
+function initParser() {
+  const fetchBtn  = document.getElementById('parser-fetch-btn');
+  const input     = document.getElementById('parser-channel');
+  if (!fetchBtn) return;
+
+  fetchBtn.addEventListener('click', runParser);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') runParser(); });
+}
+
+async function runParser() {
+  const raw = (document.getElementById('parser-channel')?.value || '').trim();
+  if (!raw) { showToast('Kanal username kiriting', 'error'); return; }
+
+  // Normalize: strip https://t.me/ or @
+  let channel = raw.replace(/^https?:\/\/t\.me\//, '').replace(/^@/, '').split('/')[0].split('?')[0];
+  if (!channel) { showToast('Noto\'g\'ri kanal manzili', 'error'); return; }
+
+  const loading = document.getElementById('parser-loading');
+  const error   = document.getElementById('parser-error');
+  const results = document.getElementById('parser-results');
+
+  loading.classList.remove('hidden');
+  error.classList.add('hidden');
+  results.classList.add('hidden');
+
+  try {
+    // Fetch via allorigins CORS proxy
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://t.me/s/' + channel)}`;
+    const resp = await fetch(proxyUrl);
+    if (!resp.ok) throw new Error('Serverdan javob kelmadi');
+    const data = await resp.json();
+    const html = data.contents;
+    if (!html) throw new Error('Kanal topilmadi yoki yopiq');
+
+    const posts = parseTelegramHTML(html, channel);
+    if (!posts.length) throw new Error('Postlar topilmadi — kanal yopiq yoki bo\'sh bo\'lishi mumkin');
+
+    renderParserResults(channel, posts);
+  } catch (e) {
+    error.classList.remove('hidden');
+    error.textContent = '⚠️ ' + e.message;
+  } finally {
+    loading.classList.add('hidden');
+  }
+}
+
+function parseTelegramHTML(html, channel) {
+  const parser = new DOMParser();
+  const doc    = parser.parseFromString(html, 'text/html');
+  const items  = doc.querySelectorAll('.tgme_widget_message');
+  const posts  = [];
+
+  items.forEach(item => {
+    const textEl = item.querySelector('.tgme_widget_message_text');
+    const imgEl  = item.querySelector('.tgme_widget_message_photo_wrap, .tgme_widget_message_video_thumb');
+    const dateEl = item.querySelector('.tgme_widget_message_date time');
+    const viewEl = item.querySelector('.tgme_widget_message_views');
+    const linkEl = item.querySelector('.tgme_widget_message_date');
+
+    const text    = textEl ? textEl.innerText || textEl.textContent : '';
+    const imgUrl  = imgEl  ? (imgEl.style.backgroundImage.match(/url\("?([^")\s]+)"?\)/)?.[1] || '') : '';
+    const date    = dateEl ? dateEl.getAttribute('datetime') : '';
+    const views   = viewEl ? viewEl.textContent.trim() : '';
+    const postUrl = linkEl ? linkEl.href : '';
+
+    if (text.trim() || imgUrl) {
+      posts.push({ text: text.trim(), imgUrl, date, views, postUrl });
+    }
+  });
+
+  return posts.reverse(); // newest first
+}
+
+function renderParserResults(channel, posts) {
+  document.getElementById('parser-channel-title').textContent = '@' + channel;
+  document.getElementById('parser-count').textContent = posts.length + ' ta post';
+
+  const list = document.getElementById('parser-posts-list');
+  list.innerHTML = posts.map((p, i) => {
+    const dateStr = p.date ? new Date(p.date).toLocaleDateString('uz-UZ') : '';
+    const img = p.imgUrl ? `<img src="${p.imgUrl}" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin-bottom:0.75rem;" loading="lazy">` : '';
+    const shortText = p.text.length > 300 ? p.text.slice(0, 300) + '…' : p.text;
+    return `
+      <div class="card" style="padding:0;">
+        <div class="card-body" style="padding:1.1rem;">
+          ${img}
+          ${shortText ? `<p style="margin:0 0 0.75rem;white-space:pre-wrap;font-size:0.9rem;line-height:1.55;">${shortText}</p>` : ''}
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
+            <div style="display:flex;gap:1rem;font-size:0.78rem;color:var(--color-gray-500);">
+              ${dateStr ? `<span>📅 ${dateStr}</span>` : ''}
+              ${p.views   ? `<span>👁 ${p.views}</span>` : ''}
+              ${p.postUrl ? `<a href="${p.postUrl}" target="_blank" rel="noopener" style="color:var(--color-primary);">Asl post ↗</a>` : ''}
+            </div>
+            <button class="btn btn-primary btn-sm parser-use-btn" data-idx="${i}" style="white-space:nowrap;">
+              ✏️ Post yaratish
+            </button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Wire "Post yaratish" buttons
+  list.querySelectorAll('.parser-use-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const p = posts[+btn.dataset.idx];
+      const ta = document.getElementById('post-content');
+      if (ta) ta.value = p.text;
+      showSection('create-post');
+      showToast('Matn Post yaratish sahifasiga ko\'chirildi ✓', 'success');
+    });
+  });
+
+  document.getElementById('parser-results').classList.remove('hidden');
+}
