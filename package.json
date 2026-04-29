@@ -1,0 +1,11 @@
+{
+  "name": "secure-social-manager",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node build.js"
+  },
+  "devDependencies": {
+    "terser": "^5.36.0"
+  }
+}
