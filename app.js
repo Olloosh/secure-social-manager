@@ -1037,9 +1037,62 @@ document.getElementById('create-post-form')?.addEventListener('submit', async (e
   }, 3000);
 });
 
+// "Hoziroq yuklash" button — publish immediately without scheduling
+document.getElementById('publish-now-btn')?.addEventListener('click', async () => {
+  const email = getSession();
+  if (!email) { showToast('Avval login qiling', 'error'); return; }
+
+  const platform = document.querySelector('input[name="platform"]:checked')?.value || 'telegram';
+  const content  = document.getElementById('post-content').value.trim();
+  if (!content) { showToast('Matn bo\'sh bo\'lmasligi kerak', 'error'); return; }
+
+  if (connectedSet.size === 0) {
+    showToast('Avval account qo\'shing — Sozlamalar → Platformalar', 'error');
+    showSection('settings');
+    document.querySelector('.settings-nav-item[data-settings="platforms"]')?.click();
+    return;
+  }
+  if (!connectedSet.has(platform)) {
+    showToast(`${platform.charAt(0).toUpperCase()+platform.slice(1)} ulanmagan`, 'error');
+    return;
+  }
+
+  const btn = document.getElementById('publish-now-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span> Yuborilmoqda...';
+
+  const imgUrl = pendingMedia?.type === 'image' ? pendingMedia.dataUrl : null;
+  const post = {
+    id: String(Date.now()), platform, content,
+    media: pendingMedia, scheduledAt: null,
+    createdAt: Date.now(), status: 'scheduled', error: null,
+  };
+
+  try {
+    await publishNow(platform, content, imgUrl);
+    post.status = 'published';
+    showToast(`${platform.charAt(0).toUpperCase()+platform.slice(1)} ga muvaffaqiyatli yuborildi ✓`, 'success');
+    document.getElementById('schedule-success')?.classList.add('show');
+    setTimeout(() => document.getElementById('schedule-success')?.classList.remove('show'), 3000);
+    document.getElementById('create-post-form').reset();
+  } catch (err) {
+    post.status = 'failed';
+    post.error  = err.message;
+    showToast('Xatolik: ' + err.message, 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span>⚡</span> Hoziroq yuklash';
+
+  const posts = loadPosts(email);
+  posts.unshift(post);
+  savePosts(email, posts);
+  renderPosts();
+});
+
 // Save draft button
 document.getElementById('save-draft-btn')?.addEventListener('click', () => {
-  showToast('Draft saved successfully!', 'success');
+  showToast('Qoralama saqlandi ✓', 'success');
 });
 
 // ========================================
