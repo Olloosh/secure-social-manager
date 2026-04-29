@@ -1295,66 +1295,74 @@ function loadFacebookSDK() {
 function mountTelegramWidget() {
   const slot = document.getElementById('telegram-widget-slot');
   const warn = document.getElementById('detail-config-warn');
-  const btn  = document.getElementById('detail-connect-btn');
+  const mainBtn = document.getElementById('detail-connect-btn');
   if (!slot) return;
-  slot.innerHTML = '';
-  warn.classList.add('hidden');
-  slot.classList.add('hidden');
-  btn.style.display = '';   // show the main connect button
-}
 
-function openTelegramPopup() {
+  warn.classList.add('hidden');
+  mainBtn.style.display = 'none';   // hide main btn; slot has its own
+  slot.classList.remove('hidden');
+
   const botId    = CFG.TELEGRAM_BOT_ID;
   const origin   = window.location.origin;
   const returnTo = encodeURIComponent(origin + window.location.pathname + '?tg_auth=1');
   const url      = `https://oauth.telegram.org/auth?bot_id=${botId}&origin=${encodeURIComponent(origin)}&embed=1&request_access=write&return_to=${returnTo}`;
 
-  const w = 550, h = 500;
-  const left = Math.round((screen.width  - w) / 2);
-  const top  = Math.round((screen.height - h) / 2);
-  const popup = window.open(url, 'tg_oauth',
-    `width=${w},height=${h},left=${left},top=${top},toolbar=0,location=0,status=0,menubar=0,scrollbars=1`);
+  // Render a button inside the slot with a SYNCHRONOUS click handler so
+  // Chrome's popup blocker treats it as a direct user gesture.
+  slot.innerHTML = `
+    <button id="tg-popup-btn" style="
+      display:flex;align-items:center;justify-content:center;gap:0.6rem;
+      width:100%;padding:0.85rem 1.2rem;margin-top:1rem;
+      background:#29B6F6;color:#fff;border:none;border-radius:10px;
+      font-size:1rem;font-weight:600;cursor:pointer;">
+      <img src="https://cdn.simpleicons.org/telegram/ffffff" style="width:20px;height:20px;">
+      Telegram hisobini ulash
+    </button>`;
 
-  if (!popup) {
-    showToast('Popup bloklandi — brauzerda popup ruxsat bering', 'warning');
-    return;
-  }
+  document.getElementById('tg-popup-btn').addEventListener('click', () => {
+    const w = 550, h = 500;
+    const left = Math.round((screen.width  - w) / 2);
+    const top  = Math.round((screen.height - h) / 2);
+    const popup = window.open(url, 'tg_oauth',
+      `width=${w},height=${h},left=${left},top=${top},toolbar=0,location=0,status=0,menubar=0,scrollbars=1`);
 
-  showLoading('Telegram');
-
-  // Telegram redirects the popup to return_to URL with auth data as query params.
-  // The popup page (our own page) detects ?tg_auth=1 on load and postMessages back.
-  function onMessage(e) {
-    if (e.origin !== window.location.origin) return;
-    if (!e.data || e.data.type !== 'tg_auth') return;
-    cleanup();
-    if (!popup.closed) popup.close();
-    const user = e.data.user;
-    if (user && user.id) {
-      saveOAuth('telegram', {
-        user_id:    user.id,
-        username:   user.username,
-        first_name: user.first_name,
-        last_name:  user.last_name,
-        photo_url:  user.photo_url,
-        auth_date:  user.auth_date,
-      });
-      showSuccessAndClose('Telegram', user.username || user.first_name);
-    } else {
-      showError('Telegram ulash bekor qilindi');
+    if (!popup) {
+      showToast('Popup bloklandi — manzil satri yonidagi belgiga bosib ruxsat bering', 'warning');
+      return;
     }
-  }
+    showLoading('Telegram');
 
-  const timer = setInterval(() => {
-    if (popup.closed) { cleanup(); showModalStep('detail'); }
-  }, 600);
+    function onMessage(e) {
+      if (e.origin !== window.location.origin) return;
+      if (!e.data || e.data.type !== 'tg_auth') return;
+      cleanup();
+      if (!popup.closed) popup.close();
+      const user = e.data.user;
+      if (user && user.id) {
+        saveOAuth('telegram', {
+          user_id:    user.id,
+          username:   user.username,
+          first_name: user.first_name,
+          last_name:  user.last_name,
+          photo_url:  user.photo_url,
+          auth_date:  user.auth_date,
+        });
+        showSuccessAndClose('Telegram', user.username || user.first_name);
+      } else {
+        showError('Telegram ulash bekor qilindi');
+      }
+    }
 
-  function cleanup() {
-    clearInterval(timer);
-    window.removeEventListener('message', onMessage);
-  }
+    const timer = setInterval(() => {
+      if (popup.closed) { cleanup(); showModalStep('detail'); }
+    }, 600);
 
-  window.addEventListener('message', onMessage);
+    function cleanup() {
+      clearInterval(timer);
+      window.removeEventListener('message', onMessage);
+    }
+    window.addEventListener('message', onMessage);
+  });
 }
 
 // ── Facebook login flow ──────────────────────────────────
