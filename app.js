@@ -183,6 +183,14 @@ document.getElementById('go-to-login')?.addEventListener('click', (e) => {
   showPage('login');
 });
 
+document.getElementById('clear-all-data')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  if (!confirm('Barcha akkauntlar va ma\'lumotlar o\'chiriladi. Davom etasizmi?')) return;
+  localStorage.clear();
+  sessionStorage.clear();
+  location.reload();
+});
+
 document.getElementById('go-to-forgot')?.addEventListener('click', (e) => {
   e.preventDefault();
   forgotReset();
