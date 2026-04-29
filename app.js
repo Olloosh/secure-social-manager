@@ -1,7 +1,27 @@
 /**
  * Secure Social Manager - Application JavaScript
- * Handles page navigation, form interactions, and UI state management
  */
+
+// ── Security helpers ──────────────────────────────────────
+function escapeHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+function safeUrl(url) {
+  try {
+    const u = new URL(url);
+    return (u.protocol === 'https:' || u.protocol === 'http:') ? url : '#';
+  } catch { return '#'; }
+}
+function sanitizeError(err) {
+  // Strip anything that looks like a token (long hex/base64 strings)
+  const msg = String(err?.message || err || 'Xatolik yuz berdi');
+  return msg.replace(/[A-Za-z0-9+/=]{40,}/g, '[***]').slice(0, 200);
+}
 
 // ========================================
 // Toast Notifications
@@ -820,8 +840,8 @@ function renderPosts() {
             ${statusBadge}
             <button class="post-delete" data-id="${p.id}">🗑 O'chirish</button>
           </div>
-          <p class="post-text">${(p.content || '').replace(/</g,'&lt;')}</p>
-          ${p.error ? `<p class="text-muted" style="color:var(--color-danger);font-size:0.8rem;margin:0;">${p.error}</p>` : ''}
+          <p class="post-text">${escapeHtml(p.content)}</p>
+          ${p.error ? `<p class="text-muted" style="color:var(--color-danger);font-size:0.8rem;margin:0;">${escapeHtml(p.error)}</p>` : ''}
         </div>
       </div>`;
   }).join('');
@@ -994,8 +1014,8 @@ document.getElementById('create-post-form')?.addEventListener('submit', async (e
       showToast(`${platform.charAt(0).toUpperCase()+platform.slice(1)} ga yuborildi ✓`, 'success');
     } catch (err) {
       post.status = 'failed';
-      post.error  = err.message;
-      showToast(`Xatolik: ${err.message}`, 'error');
+      post.error  = sanitizeError(err);
+      showToast(`Xatolik: ${sanitizeError(err)}`, 'error');
     }
   } else {
     showToast(`Post ${new Date(scheduledAt || Date.now()).toLocaleString()} ga rejalashtirildi 📅`, 'success');
@@ -1080,7 +1100,7 @@ document.getElementById('publish-now-btn')?.addEventListener('click', async () =
   } catch (err) {
     post.status = 'failed';
     post.error  = err.message;
-    showToast('Xatolik: ' + err.message, 'error');
+    showToast('Xatolik: ' + sanitizeError(err), 'error');
   }
 
   btn.disabled = false;
@@ -1610,7 +1630,7 @@ document.getElementById('detail-connect-btn')?.addEventListener('click', async (
       const data = await loginWithFacebook();
       saveOAuth('facebook', data);
       showSuccessAndClose('Facebook', data.name);
-    } catch (e) { showError(e.message); }
+    } catch (e) { showError(sanitizeError(e)); }
     return;
   }
 
@@ -1622,7 +1642,7 @@ document.getElementById('detail-connect-btn')?.addEventListener('click', async (
       const data = await loginWithInstagram();
       saveOAuth('instagram', data);
       showSuccessAndClose('Instagram', data.username);
-    } catch (e) { showError(e.message); }
+    } catch (e) { showError(sanitizeError(e)); }
     return;
   }
 
@@ -1865,16 +1885,24 @@ function formatBytes(n) {
 function renderAdminPanel() {
   const users = loadUsers();
   const emails = Object.keys(users);
-  const oauth  = JSON.parse(localStorage.getItem(OAUTH_STORE_KEY) || '{}');
-  const oauthPlatforms = Object.keys(oauth);
+
+  // Count connected platforms across all accounts (from per-account keys)
+  let totalOauth = 0;
+  emails.forEach(em => {
+    try {
+      const key = `ssm_oauth_${em}`;
+      const d = JSON.parse(localStorage.getItem(key) || '{}');
+      totalOauth += Object.keys(d).length;
+    } catch {}
+  });
 
   document.getElementById('admin-stat-users').textContent   = emails.length;
-  document.getElementById('admin-stat-oauth').textContent   = oauthPlatforms.length;
+  document.getElementById('admin-stat-oauth').textContent   = totalOauth;
   document.getElementById('admin-stat-storage').textContent = formatBytes(bytesOfLocalStorage());
   document.getElementById('admin-stat-session').textContent =
     new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
 
-  // Users table
+  // Users table — escape all user-supplied content
   const tbody = document.getElementById('admin-users-body');
   if (!emails.length) {
     tbody.innerHTML = '<tr><td colspan="4" class="admin-empty">Hali foydalanuvchilar yo\'q</td></tr>';
@@ -1885,30 +1913,34 @@ function renderAdminPanel() {
       const date = new Date(u.created_at).toLocaleString('uz-UZ', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
       return `
         <tr>
-          <td><span class="admin-email">${email}</span>${isAdm ? '<span class="admin-role-badge">ADMIN</span>' : ''}</td>
-          <td>${u.name}</td>
-          <td>${date}</td>
-          <td>${isAdm ? '<span style="color:#9ca3af;font-size:0.78rem;">— (himoyalangan)</span>' : `<button class="admin-action-btn" data-del-user="${email}">O'chirish</button>`}</td>
+          <td><span class="admin-email">${escapeHtml(email)}</span>${isAdm ? '<span class="admin-role-badge">ADMIN</span>' : ''}</td>
+          <td>${escapeHtml(u.name)}</td>
+          <td>${escapeHtml(date)}</td>
+          <td>${isAdm ? '<span style="color:#9ca3af;font-size:0.78rem;">— (himoyalangan)</span>' : `<button class="admin-action-btn" data-del-user="${escapeHtml(email)}">O'chirish</button>`}</td>
         </tr>`;
     }).join('');
   }
 
-  // OAuth chips
+  // Connected platforms per account (no tokens shown)
   const oauthWrap = document.getElementById('admin-oauth-list');
-  if (!oauthPlatforms.length) {
-    oauthWrap.innerHTML = '<p class="admin-empty">Hech qanday akkaunt ulanmagan</p>';
-  } else {
-    oauthWrap.innerHTML = oauthPlatforms.map(pid => {
-      const d = oauth[pid];
-      const label = d.username || d.name || d.first_name || d.user_id || '—';
-      return `
-        <div class="admin-oauth-chip">
-          <span class="admin-oauth-chip-dot"></span>
-          <strong>${pid}</strong>
-          <span style="color:#6b7280;">${label}</span>
-        </div>`;
-    }).join('');
-  }
+  const chips = [];
+  emails.forEach(em => {
+    try {
+      const d = JSON.parse(localStorage.getItem(`ssm_oauth_${em}`) || '{}');
+      Object.keys(d).forEach(pid => {
+        const label = d[pid].username || d[pid].name || d[pid].first_name || '—';
+        chips.push(`
+          <div class="admin-oauth-chip">
+            <span class="admin-oauth-chip-dot"></span>
+            <strong>${escapeHtml(pid)}</strong>
+            <span style="color:#6b7280;">${escapeHtml(label)}</span>
+          </div>`);
+      });
+    } catch {}
+  });
+  oauthWrap.innerHTML = chips.length
+    ? chips.join('')
+    : '<p class="admin-empty">Hech qanday akkaunt ulanmagan</p>';
 }
 
 // Delete user action
@@ -1999,6 +2031,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   await seedAdmin();
+  // Remove legacy unscoped OAuth key (security: was storing all tokens in one global key)
+  localStorage.removeItem('ssm_oauth');
   refreshAdminNav();
 
   // Auto-login if a session exists and user is still registered
@@ -2125,7 +2159,7 @@ function renderParserResults(channel, posts) {
     const img       = p.imgUrl
       ? `<img src="${p.imgUrl}" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin-bottom:0.75rem;" loading="lazy">`
       : '';
-    const shortText = p.text.length > 300 ? p.text.slice(0, 300) + '…' : p.text;
+    const shortText = escapeHtml(p.text.length > 300 ? p.text.slice(0, 300) + '…' : p.text);
 
     return `
       <div class="card" style="padding:0;" id="parser-card-${i}">
@@ -2134,9 +2168,9 @@ function renderParserResults(channel, posts) {
           ${shortText ? `<p style="margin:0 0 0.75rem;white-space:pre-wrap;font-size:0.9rem;line-height:1.55;">${shortText}</p>` : ''}
           <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
             <div style="display:flex;gap:1rem;font-size:0.78rem;color:var(--color-gray-500);">
-              ${dateStr  ? `<span>📅 ${dateStr}</span>` : ''}
-              ${p.views  ? `<span>👁 ${p.views}</span>` : ''}
-              ${p.postUrl? `<a href="${p.postUrl}" target="_blank" rel="noopener" style="color:var(--color-primary);">Asl post ↗</a>` : ''}
+              ${dateStr  ? `<span>📅 ${escapeHtml(dateStr)}</span>` : ''}
+              ${p.views  ? `<span>👁 ${escapeHtml(String(p.views))}</span>` : ''}
+              ${p.postUrl? `<a href="${safeUrl(p.postUrl)}" target="_blank" rel="noopener noreferrer" style="color:var(--color-primary);">Asl post ↗</a>` : ''}
             </div>
             <div style="display:flex;gap:0.5rem;">
               <button class="btn btn-outline btn-sm parser-use-btn" data-idx="${i}">✏️ Tahrirlash</button>
@@ -2240,7 +2274,7 @@ function renderParserResults(channel, posts) {
       } catch (err) {
         btn.textContent = '⚡ Hoziroq';
         btn.disabled = false;
-        showToast('Xatolik: ' + err.message, 'error');
+        showToast('Xatolik: ' + sanitizeError(err), 'error');
       }
     });
   });
