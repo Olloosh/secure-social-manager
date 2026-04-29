@@ -20,7 +20,7 @@
         linked to a Facebook Page (Meta requirement).
    ───────────────────────────────────────────────────────────── */
 window.OAUTH_CONFIG = {
-  TELEGRAM_BOT_USERNAME: '',                  // to be filled after @BotFather setup
+  TELEGRAM_BOT_USERNAME: 'securesocialmanager_bot',
   FACEBOOK_APP_ID:       '1487980476353532',  // Social Manager app
 
   // Permissions we ask for. Leave as-is unless you know why
