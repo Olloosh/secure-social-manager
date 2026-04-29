@@ -288,8 +288,10 @@ const USERS_KEY = 'ssm_users';
 const SESSION_KEY = 'ssm_session';
 
 // Hardcoded admin email — seeded on first load
-const ADMIN_EMAIL    = 'admin@ssm.uz';
-const ADMIN_PASSWORD = 'admin123';
+const ADMIN_EMAIL = 'admin@ssm.uz';
+// Never log or expose these hashes — they are SHA-256 digests only
+const _AH  = '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9';
+const _APH = '8f01f2e0a9140cd538f0874c0f72269395ebc55d7a17e2d883553e2a36170da3';
 
 function isAdmin(email) { return (email || '').toLowerCase() === ADMIN_EMAIL; }
 
@@ -1396,8 +1398,6 @@ function saveOAuth(platform, data) {
   const all = JSON.parse(localStorage.getItem(key) || '{}');
   all[platform] = { ...data, connected_at: Date.now() };
   localStorage.setItem(key, JSON.stringify(all));
-  // legacy key for admin panel reads
-  localStorage.setItem(OAUTH_STORE_KEY, JSON.stringify(all));
 }
 function getOAuth(platform) {
   const key = _oauthKey();
@@ -1828,14 +1828,13 @@ async function seedAdmin() {
   if (!users[ADMIN_EMAIL]) {
     users[ADMIN_EMAIL] = {
       name:           'Admin',
-      passwordHash:   await sha256(ADMIN_PASSWORD),
-      passphraseHash: await sha256('secureadmin'),
+      passwordHash:   _AH,
+      passphraseHash: _APH,
       passphraseHint: 'tizim boshlig\'ining maxsus so\'zi',
       created_at:     Date.now(),
       role:           'admin',
     };
     saveUsers(users);
-    console.log(`🛡 Admin seeded: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}  (2FA: secureadmin)`);
   }
 }
 
@@ -2028,8 +2027,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ── Parser section ────────────────────────────────────
   initParser();
 
-  console.log('🔐 Secure Social Manager initialized');
-  console.log(`🛡 Admin login: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`);
 });
 
 // ========================================
