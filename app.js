@@ -33,6 +33,7 @@ const pages = {
   register:      document.getElementById('page-register'),
   '2fa-setup':   document.getElementById('page-2fa-setup'),
   '2fa-verify':  document.getElementById('page-2fa-verify'),
+  forgot:        document.getElementById('page-forgot'),
   app:           document.getElementById('app-layout')
 };
 
