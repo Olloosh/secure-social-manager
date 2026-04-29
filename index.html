@@ -772,6 +772,18 @@
               <div data-settings-panel="account" class="hidden">
                 <div class="settings-section">
                   <h3>👤 Akkaunt ma'lumotlari</h3>
+                  <div class="form-group avatar-upload-group">
+                    <label class="form-label">Profil rasmi</label>
+                    <div class="avatar-upload-row">
+                      <div class="avatar-preview" id="avatar-preview">—</div>
+                      <div class="avatar-upload-controls">
+                        <label for="avatar-input" class="btn btn-outline btn-sm">📷 Rasm tanlash</label>
+                        <input type="file" id="avatar-input" accept="image/*" hidden>
+                        <button type="button" class="btn btn-ghost btn-sm" id="avatar-remove-btn" style="display:none;">🗑 O'chirish</button>
+                        <p class="form-hint" style="margin: 0.25rem 0 0;">PNG/JPG, maks. 2 MB</p>
+                      </div>
+                    </div>
+                  </div>
                   <div class="form-group">
                     <label class="form-label" for="account-name">To'liq ism</label>
                     <input type="text" id="account-name" class="form-input" placeholder="To'liq ism">

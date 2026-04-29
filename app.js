@@ -483,14 +483,33 @@ function addAndSwitchAccount(name, email) {
 
   const active = savedAccounts.find(a => a.active);
 
+  // Look up stored avatar image (if any)
+  const usersMap = loadUsers();
+  const userRec  = usersMap[active.email];
+  const avatarImg = userRec && userRec.avatar;
+
   // Update topbar
-  document.getElementById('topbar-avatar').textContent = active.initials;
-  document.getElementById('topbar-avatar').style.background = `linear-gradient(135deg, ${active.color}, ${active.color}cc)`;
+  const topbarAvatar = document.getElementById('topbar-avatar');
+  if (avatarImg) {
+    topbarAvatar.innerHTML = `<img src="${avatarImg}" alt="avatar">`;
+    topbarAvatar.style.background = 'transparent';
+  } else {
+    topbarAvatar.innerHTML = '';
+    topbarAvatar.textContent = active.initials;
+    topbarAvatar.style.background = `linear-gradient(135deg, ${active.color}, ${active.color}cc)`;
+  }
   document.getElementById('topbar-name').textContent  = active.name;
   document.getElementById('topbar-role').textContent  = active.role;
 
   // Update all other avatar/name refs
-  document.querySelectorAll('.user-avatar').forEach(el => { el.textContent = active.initials; });
+  document.querySelectorAll('.user-avatar').forEach(el => {
+    if (avatarImg) {
+      el.innerHTML = `<img src="${avatarImg}" alt="avatar">`;
+    } else {
+      el.innerHTML = '';
+      el.textContent = active.initials;
+    }
+  });
   document.querySelectorAll('.user-info .name').forEach(el => { el.textContent = active.name; });
 
   const firstName = active.name.split(' ')[0];
@@ -883,7 +902,67 @@ function populateAccountForm() {
   if (userEl)     userEl.value     = user.username || '@' + email.split('@')[0];
   if (birthdayEl) birthdayEl.value = user.birthday || '';
   if (genderEl)   genderEl.value   = user.gender || '';
+
+  // Avatar preview
+  const preview = document.getElementById('avatar-preview');
+  const removeBtn = document.getElementById('avatar-remove-btn');
+  if (preview) {
+    if (user.avatar) {
+      preview.innerHTML = `<img src="${user.avatar}" alt="avatar">`;
+      if (removeBtn) removeBtn.style.display = '';
+    } else {
+      const initials = (user.name || email).trim().split(/\s+/).map(w => w[0]).join('').slice(0,2).toUpperCase() || '—';
+      preview.innerHTML = '';
+      preview.textContent = initials;
+      if (removeBtn) removeBtn.style.display = 'none';
+    }
+  }
 }
+
+// Avatar upload handler
+document.getElementById('avatar-input')?.addEventListener('change', (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    showToast('Faqat rasm fayllari ruxsat etiladi', 'error');
+    e.target.value = '';
+    return;
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    showToast('Rasm juda katta — maks. 2 MB', 'error');
+    e.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const email = getSession();
+    if (!email) return;
+    const users = loadUsers();
+    const user  = users[email];
+    if (!user)  return;
+    user.avatar = reader.result;
+    saveUsers(users);
+    addAndSwitchAccount(user.name, email);
+    populateAccountForm();
+    showToast('Profil rasmi yangilandi ✓', 'success');
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+
+// Avatar remove handler
+document.getElementById('avatar-remove-btn')?.addEventListener('click', () => {
+  const email = getSession();
+  if (!email) return;
+  const users = loadUsers();
+  const user  = users[email];
+  if (!user)  return;
+  delete user.avatar;
+  saveUsers(users);
+  addAndSwitchAccount(user.name, email);
+  populateAccountForm();
+  showToast('Profil rasmi o\'chirildi', 'info');
+});
 
 // 2FA Toggle
 const twoFactorToggle = document.getElementById('2fa-toggle');
@@ -1350,8 +1429,16 @@ function switchAccount(id) {
   savedAccounts.forEach(a => a.active = (a.id === id));
 
   // Update topbar UI
-  document.getElementById('topbar-avatar').textContent  = acc.initials;
-  document.getElementById('topbar-avatar').style.background = `linear-gradient(135deg, ${acc.color}, ${acc.color}cc)`;
+  const sa = document.getElementById('topbar-avatar');
+  const userRec = loadUsers()[acc.email];
+  if (userRec && userRec.avatar) {
+    sa.innerHTML = `<img src="${userRec.avatar}" alt="avatar">`;
+    sa.style.background = 'transparent';
+  } else {
+    sa.innerHTML = '';
+    sa.textContent = acc.initials;
+    sa.style.background = `linear-gradient(135deg, ${acc.color}, ${acc.color}cc)`;
+  }
   document.getElementById('topbar-name').textContent    = acc.name;
   document.getElementById('topbar-role').textContent    = acc.role;
 
