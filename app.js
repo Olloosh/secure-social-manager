@@ -1378,17 +1378,16 @@ async function loginWithInstagram() {
     FB.login((resp) => {
       if (resp.status !== 'connected') return reject(new Error('Instagram login bekor qilindi'));
       const token = resp.authResponse.accessToken;
-      // Try to get Instagram username via connected IG accounts; fall back to FB name
-      FB.api('/me', { fields: 'id,name,picture,instagram_accounts{username,profile_picture_url}' }, (me) => {
-        const igAccount = me.instagram_accounts?.data?.[0];
+      FB.api('/me', { fields: 'id,name,picture' }, (me) => {
+        if (!me || me.error) return reject(new Error(me?.error?.message || 'FB API xatosi'));
         resolve({
           access_token: token,
           user_id:      me.id,
-          username:     igAccount?.username || me.name,
-          avatar:       igAccount?.profile_picture_url || me.picture?.data?.url,
+          username:     me.name,
+          avatar:       me.picture?.data?.url,
         });
       });
-    }, { scope: 'public_profile,instagram_basic', return_scopes: true });
+    }, { scope: 'public_profile' });
   });
 }
 
