@@ -10,12 +10,16 @@ fs.mkdirSync(dist, { recursive: true });
   fs.copyFileSync(path.join(__dirname, f), path.join(dist, f))
 );
 
-// Inject env vars into oauth-config then minify
+// Inject env vars (fallback to defaults so build works without env vars set)
+const TG_BOT_USERNAME = process.env.TG_BOT_USERNAME || 'securesocialmanager_bot';
+const TG_BOT_ID       = process.env.TG_BOT_ID       || '8506396231';
+const FB_APP_ID       = process.env.FB_APP_ID        || '1487980476353532';
+
 let oauthSrc = fs.readFileSync('oauth-config.js', 'utf8');
 oauthSrc = oauthSrc
-  .replace(/__TELEGRAM_BOT_USERNAME__/g, process.env.TG_BOT_USERNAME || '')
-  .replace(/__TELEGRAM_BOT_ID__/g,       process.env.TG_BOT_ID       || '')
-  .replace(/__FACEBOOK_APP_ID__/g,        process.env.FB_APP_ID       || '');
+  .replace(/__TELEGRAM_BOT_USERNAME__/g, TG_BOT_USERNAME)
+  .replace(/__TELEGRAM_BOT_ID__/g,       TG_BOT_ID)
+  .replace(/__FACEBOOK_APP_ID__/g,        FB_APP_ID);
 
 // Minify JS files
 async function build() {
