@@ -1388,21 +1388,87 @@ document.getElementById('platforms-list')?.addEventListener('click', e => {
 // ═══════════════════════════════════════════════════════════
 const CFG = window.OAUTH_CONFIG || {};
 
-// ── localStorage helpers ─────────────────────────────────
+// ── localStorage helpers (per-account) ───────────────────
 const OAUTH_STORE_KEY = 'ssm_oauth';
+function _oauthKey() { return `ssm_oauth_${getSession() || '__global__'}`; }
 function saveOAuth(platform, data) {
-  const all = JSON.parse(localStorage.getItem(OAUTH_STORE_KEY) || '{}');
+  const key = _oauthKey();
+  const all = JSON.parse(localStorage.getItem(key) || '{}');
   all[platform] = { ...data, connected_at: Date.now() };
+  localStorage.setItem(key, JSON.stringify(all));
+  // legacy key for admin panel reads
   localStorage.setItem(OAUTH_STORE_KEY, JSON.stringify(all));
 }
 function getOAuth(platform) {
-  const all = JSON.parse(localStorage.getItem(OAUTH_STORE_KEY) || '{}');
+  const key = _oauthKey();
+  const all = JSON.parse(localStorage.getItem(key) || '{}');
   return all[platform];
 }
 function removeOAuth(platform) {
-  const all = JSON.parse(localStorage.getItem(OAUTH_STORE_KEY) || '{}');
+  const key = _oauthKey();
+  const all = JSON.parse(localStorage.getItem(key) || '{}');
   delete all[platform];
-  localStorage.setItem(OAUTH_STORE_KEY, JSON.stringify(all));
+  localStorage.setItem(key, JSON.stringify(all));
+}
+
+// ── Per-account connected platforms list ─────────────────
+function saveConnectedPlatforms(email) {
+  localStorage.setItem(`ssm_connected_${email}`, JSON.stringify([...connectedSet]));
+}
+function loadConnectedPlatforms(email) {
+  try { return JSON.parse(localStorage.getItem(`ssm_connected_${email}`) || '[]'); } catch { return []; }
+}
+
+// ── Reset all platform rows to disconnected state ─────────
+function resetAllPlatformUI() {
+  connectedSet.clear();
+  allPlatforms.forEach(p => {
+    const row = document.getElementById(`platform-${p.id}`);
+    if (!row) return;
+    row.querySelector('.platform-status-text').textContent = 'Ulanmagan';
+    row.style.opacity = '0.65';
+    row.querySelector('.platform-badge')?.remove();
+    const btn = row.querySelector('.platform-action-btn');
+    if (btn) btn.outerHTML = `<button class="btn btn-primary platform-action-btn" style="margin-left:auto;" data-action="connect" data-platform="${p.id}">Ulash</button>`;
+  });
+  document.getElementById('telegram-config')?.classList.add('hidden');
+}
+
+// ── Silently restore one platform row (no toast) ──────────
+function restorePlatformUI(id) {
+  connectedSet.add(id);
+  const row = document.getElementById(`platform-${id}`);
+  if (!row) return;
+  row.querySelector('.platform-status-text').textContent = 'Ulangan';
+  row.style.opacity = '1';
+  row.querySelector('.platform-badge')?.remove();
+  const btn = row.querySelector('.platform-action-btn');
+  if (btn) btn.outerHTML = `
+    <span class="badge badge-success platform-badge">✓ Ulangan</span>
+    <button class="btn btn-outline platform-action-btn" style="margin-left:auto;"
+      data-action="disconnect" data-platform="${id}">Uzish</button>`;
+  if (id === 'telegram') {
+    const cfg = document.getElementById('telegram-config');
+    if (cfg) {
+      cfg.classList.remove('hidden');
+      const saved = getTgConfig();
+      if (saved.botToken) document.getElementById('tg-bot-token').value = saved.botToken;
+      if (saved.channel)  document.getElementById('tg-channel').value   = saved.channel;
+    }
+  }
+}
+
+// ── Load full account state (platforms + posts) ───────────
+function loadAccountState(email) {
+  resetAllPlatformUI();
+  loadConnectedPlatforms(email).forEach(id => restorePlatformUI(id));
+  // Fix counter
+  document.querySelectorAll('.stat-card .stat-content').forEach(card => {
+    if (card.querySelector('p')?.textContent === 'Ulangan platformalar') {
+      card.querySelector('h3').textContent = connectedSet.size;
+    }
+  });
+  renderPosts();
 }
 
 // ── Facebook JS SDK loader (lazy, once) ──────────────────
@@ -1589,6 +1655,8 @@ function connectPlatform(id) {
       if (saved.channel)  document.getElementById('tg-channel').value  = saved.channel;
     }
   }
+  const emailNow = getSession();
+  if (emailNow) saveConnectedPlatforms(emailNow);
   updatePlatformCounter(+1);
   showToast(`${p?.name} muvaffaqiyatli ulandi!`, 'success');
 }
@@ -1610,6 +1678,9 @@ function disconnectPlatform(id) {
   if (id === 'telegram') {
     document.getElementById('telegram-config')?.classList.add('hidden');
   }
+  const emailNow = getSession();
+  if (emailNow) saveConnectedPlatforms(emailNow);
+  removeOAuth(id);
   updatePlatformCounter(-1);
   showToast(`${p?.name} ulanishi uzildi`, 'warning');
 }
@@ -1685,8 +1756,9 @@ function switchAccount(id) {
     return;
   }
 
-  // Update active state
+  // Update active state and session
   savedAccounts.forEach(a => a.active = (a.id === id));
+  setSession(acc.email, true);
 
   // Update topbar UI
   const sa = document.getElementById('topbar-avatar');
@@ -1699,13 +1771,16 @@ function switchAccount(id) {
     sa.textContent = acc.initials;
     sa.style.background = `linear-gradient(135deg, ${acc.color}, ${acc.color}cc)`;
   }
-  document.getElementById('topbar-name').textContent    = acc.name;
-  document.getElementById('topbar-role').textContent    = acc.role;
+  document.getElementById('topbar-name').textContent = acc.name;
+  document.getElementById('topbar-role').textContent = acc.role;
 
   // Update welcome message
   const firstName = acc.name.split(' ')[0];
   const welcomeEl = document.querySelector('#section-dashboard .welcome-section h1');
   if (welcomeEl) welcomeEl.textContent = `Xush kelibsiz, ${firstName}! 👋`;
+
+  // Restore this account's platform connections and posts
+  loadAccountState(acc.email);
 
   renderAccountList();
   closeAccountDropdown();
@@ -1932,6 +2007,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const users = loadUsers();
   if (sessionEmail && users[sessionEmail]) {
     addAndSwitchAccount(users[sessionEmail].name, sessionEmail);
+    loadAccountState(sessionEmail);
     showPage('app');
     showSection('dashboard');
   } else {
