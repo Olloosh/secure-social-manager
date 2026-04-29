@@ -1319,49 +1319,10 @@ function mountTelegramWidget() {
       Telegram hisobini ulash
     </button>`;
 
+  // Direct redirect — no popup needed, Chrome can't block it.
+  // Telegram will send auth data as query params to return_to URL.
   document.getElementById('tg-popup-btn').addEventListener('click', () => {
-    const w = 550, h = 500;
-    const left = Math.round((screen.width  - w) / 2);
-    const top  = Math.round((screen.height - h) / 2);
-    const popup = window.open(url, 'tg_oauth',
-      `width=${w},height=${h},left=${left},top=${top},toolbar=0,location=0,status=0,menubar=0,scrollbars=1`);
-
-    if (!popup) {
-      showToast('Popup bloklandi — manzil satri yonidagi belgiga bosib ruxsat bering', 'warning');
-      return;
-    }
-    showLoading('Telegram');
-
-    function onMessage(e) {
-      if (e.origin !== window.location.origin) return;
-      if (!e.data || e.data.type !== 'tg_auth') return;
-      cleanup();
-      if (!popup.closed) popup.close();
-      const user = e.data.user;
-      if (user && user.id) {
-        saveOAuth('telegram', {
-          user_id:    user.id,
-          username:   user.username,
-          first_name: user.first_name,
-          last_name:  user.last_name,
-          photo_url:  user.photo_url,
-          auth_date:  user.auth_date,
-        });
-        showSuccessAndClose('Telegram', user.username || user.first_name);
-      } else {
-        showError('Telegram ulash bekor qilindi');
-      }
-    }
-
-    const timer = setInterval(() => {
-      if (popup.closed) { cleanup(); showModalStep('detail'); }
-    }, 600);
-
-    function cleanup() {
-      clearInterval(timer);
-      window.removeEventListener('message', onMessage);
-    }
-    window.addEventListener('message', onMessage);
+    window.location.href = url;
   });
 }
 
@@ -1766,16 +1727,40 @@ window.addAndSwitchAccount = function (...args) {
 // Initialize
 // ========================================
 document.addEventListener('DOMContentLoaded', async () => {
-  // ── Telegram OAuth callback: popup landed on ?tg_auth=1 ──
+  // ── Telegram OAuth callback: page redirected back with ?tg_auth=1 ──
   const params = new URLSearchParams(window.location.search);
-  if (params.get('tg_auth') === '1' && window.opener) {
+  if (params.get('tg_auth') === '1') {
+    // Clean URL so reload won't re-trigger
+    window.history.replaceState({}, '', window.location.pathname + '#');
+
+    if (window.opener) {
+      // popup case
+      const user = {};
+      ['id','first_name','last_name','username','photo_url','auth_date','hash'].forEach(k => {
+        if (params.get(k)) user[k] = params.get(k);
+      });
+      window.opener.postMessage({ type: 'tg_auth', user }, window.location.origin);
+      window.close();
+      return;
+    }
+
+    // redirect case — save auth and continue normally
     const user = {};
     ['id','first_name','last_name','username','photo_url','auth_date','hash'].forEach(k => {
       if (params.get(k)) user[k] = params.get(k);
     });
-    window.opener.postMessage({ type: 'tg_auth', user }, window.location.origin);
-    window.close();
-    return;
+    if (user.id) {
+      saveOAuth('telegram', {
+        user_id:    user.id,
+        username:   user.username,
+        first_name: user.first_name,
+        last_name:  user.last_name,
+        photo_url:  user.photo_url,
+        auth_date:  user.auth_date,
+      });
+      // mark connected in UI after app loads
+      localStorage.setItem('ssm_pending_connect', 'telegram');
+    }
   }
 
   await seedAdmin();
@@ -1791,6 +1776,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   } else {
     clearSession();
     showPage('login');
+  }
+
+  // ── Handle pending platform connect after OAuth redirect ──
+  const pendingConnect = localStorage.getItem('ssm_pending_connect');
+  if (pendingConnect) {
+    localStorage.removeItem('ssm_pending_connect');
+    connectPlatform(pendingConnect);
+    showSection('settings');
+    document.querySelector('.settings-nav-item[data-settings="platforms"]')?.click();
+    showToast(`${pendingConnect.charAt(0).toUpperCase() + pendingConnect.slice(1)} muvaffaqiyatli ulandi! ✓`, 'success');
   }
 
   console.log('🔐 Secure Social Manager initialized');
