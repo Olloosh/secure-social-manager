@@ -1878,31 +1878,70 @@ function renderParserResults(channel, posts) {
   document.getElementById('parser-channel-title').textContent = '@' + channel;
   document.getElementById('parser-count').textContent = posts.length + ' ta post';
 
+  // Build platform options from connected set
+  const platformOptions = ['telegram','instagram','facebook']
+    .map(id => `<option value="${id}" ${connectedSet.has(id) ? '' : 'disabled'}>
+      ${id.charAt(0).toUpperCase()+id.slice(1)}${connectedSet.has(id) ? '' : ' (ulanmagan)'}
+    </option>`).join('');
+
+  const now = new Date();
+  const defaultDate = now.toISOString().slice(0,10);
+  const defaultTime = now.toTimeString().slice(0,5);
+
   const list = document.getElementById('parser-posts-list');
   list.innerHTML = posts.map((p, i) => {
-    const dateStr = p.date ? new Date(p.date).toLocaleDateString('uz-UZ') : '';
-    const img = p.imgUrl ? `<img src="${p.imgUrl}" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin-bottom:0.75rem;" loading="lazy">` : '';
+    const dateStr   = p.date ? new Date(p.date).toLocaleDateString('uz-UZ') : '';
+    const img       = p.imgUrl
+      ? `<img src="${p.imgUrl}" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin-bottom:0.75rem;" loading="lazy">`
+      : '';
     const shortText = p.text.length > 300 ? p.text.slice(0, 300) + '…' : p.text;
+
     return `
-      <div class="card" style="padding:0;">
+      <div class="card" style="padding:0;" id="parser-card-${i}">
         <div class="card-body" style="padding:1.1rem;">
           ${img}
           ${shortText ? `<p style="margin:0 0 0.75rem;white-space:pre-wrap;font-size:0.9rem;line-height:1.55;">${shortText}</p>` : ''}
           <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
             <div style="display:flex;gap:1rem;font-size:0.78rem;color:var(--color-gray-500);">
-              ${dateStr ? `<span>📅 ${dateStr}</span>` : ''}
-              ${p.views   ? `<span>👁 ${p.views}</span>` : ''}
-              ${p.postUrl ? `<a href="${p.postUrl}" target="_blank" rel="noopener" style="color:var(--color-primary);">Asl post ↗</a>` : ''}
+              ${dateStr  ? `<span>📅 ${dateStr}</span>` : ''}
+              ${p.views  ? `<span>👁 ${p.views}</span>` : ''}
+              ${p.postUrl? `<a href="${p.postUrl}" target="_blank" rel="noopener" style="color:var(--color-primary);">Asl post ↗</a>` : ''}
             </div>
-            <button class="btn btn-primary btn-sm parser-use-btn" data-idx="${i}" style="white-space:nowrap;">
-              ✏️ Post yaratish
-            </button>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="btn btn-outline btn-sm parser-use-btn" data-idx="${i}">✏️ Tahrirlash</button>
+              <button class="btn btn-primary btn-sm parser-upload-btn" data-idx="${i}">📤 Yuklash</button>
+            </div>
+          </div>
+
+          <!-- Upload panel (hidden by default) -->
+          <div class="parser-upload-panel hidden" id="parser-upload-${i}"
+               style="margin-top:1rem;padding:1rem;background:var(--color-gray-50);border-radius:var(--radius-md);border:1px solid var(--color-gray-200);">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:0.5rem;align-items:flex-end;flex-wrap:wrap;">
+              <div>
+                <label style="font-size:0.78rem;color:var(--color-gray-500);display:block;margin-bottom:0.3rem;">Platforma</label>
+                <select class="form-input parser-platform-sel" style="padding:0.45rem 0.6rem;font-size:0.85rem;">
+                  ${platformOptions}
+                </select>
+              </div>
+              <div>
+                <label style="font-size:0.78rem;color:var(--color-gray-500);display:block;margin-bottom:0.3rem;">Sana</label>
+                <input type="date" class="form-input parser-date-inp" value="${defaultDate}" style="padding:0.45rem 0.6rem;font-size:0.85rem;">
+              </div>
+              <div>
+                <label style="font-size:0.78rem;color:var(--color-gray-500);display:block;margin-bottom:0.3rem;">Vaqt</label>
+                <input type="time" class="form-input parser-time-inp" value="${defaultTime}" style="padding:0.45rem 0.6rem;font-size:0.85rem;">
+              </div>
+              <button class="btn btn-primary parser-schedule-btn" data-idx="${i}"
+                      style="padding:0.45rem 0.9rem;font-size:0.85rem;white-space:nowrap;">
+                ✅ Rejalashtirish
+              </button>
+            </div>
           </div>
         </div>
       </div>`;
   }).join('');
 
-  // Wire "Post yaratish" buttons
+  // "Tahrirlash" — copy to Create Post
   list.querySelectorAll('.parser-use-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const p = posts[+btn.dataset.idx];
@@ -1910,6 +1949,60 @@ function renderParserResults(channel, posts) {
       if (ta) ta.value = p.text;
       showSection('create-post');
       showToast('Matn Post yaratish sahifasiga ko\'chirildi ✓', 'success');
+    });
+  });
+
+  // "Yuklash" — toggle upload panel
+  list.querySelectorAll('.parser-upload-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (connectedSet.size === 0) {
+        showToast('Avval Sozlamalar → Platformalar dan akkaunt ulang', 'error');
+        return;
+      }
+      const panel = document.getElementById(`parser-upload-${btn.dataset.idx}`);
+      panel.classList.toggle('hidden');
+      btn.textContent = panel.classList.contains('hidden') ? '📤 Yuklash' : '✖ Yopish';
+    });
+  });
+
+  // "Rejalashtirish" — save post
+  list.querySelectorAll('.parser-schedule-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i       = +btn.dataset.idx;
+      const p       = posts[i];
+      const panel   = document.getElementById(`parser-upload-${i}`);
+      const platform= panel.querySelector('.parser-platform-sel').value;
+      const date    = panel.querySelector('.parser-date-inp').value;
+      const time    = panel.querySelector('.parser-time-inp').value;
+
+      if (!platform) { showToast('Platforma tanlang', 'error'); return; }
+      if (!date || !time) { showToast('Sana va vaqt kiriting', 'error'); return; }
+
+      const email = getSession();
+      const saved = loadPosts(email);
+      saved.unshift({
+        id:        Date.now(),
+        platform,
+        content:   p.text,
+        media:     p.imgUrl ? { type: 'image', dataUrl: p.imgUrl } : null,
+        date,
+        time,
+        status:    'scheduled',
+        source:    'parser',
+        created_at: Date.now(),
+      });
+      savePosts(email, saved);
+
+      // Visual feedback on card
+      panel.classList.add('hidden');
+      const card = document.getElementById(`parser-card-${i}`);
+      card.style.opacity = '0.5';
+      const uploadBtn = card.querySelector('.parser-upload-btn');
+      uploadBtn.textContent = '✓ Rejalashtirildi';
+      uploadBtn.disabled = true;
+      uploadBtn.className = 'btn btn-outline btn-sm';
+
+      showToast(`Post ${platform} uchun ${date} ${time} ga rejalashtirildi ✓`, 'success');
     });
   });
 
