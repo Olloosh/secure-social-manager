@@ -876,15 +876,14 @@ h6 { font-size: var(--font-size-base); }
   border-radius: 50%;
 }
 
-.platform-icon.telegram {
-  background: #E3F2FD;
-  color: #0088CC;
-}
-
-.platform-icon.instagram {
-  background: linear-gradient(135deg, #FFECD2, #FCB69F);
-  color: #C13584;
-}
+.platform-icon.telegram  { background: #29B6F6; }
+.platform-icon.instagram { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366); }
+.platform-icon.facebook  { background: #1877F2; }
+.platform-icon.twitter   { background: #111; }
+.platform-icon.youtube   { background: #FF0000; }
+.platform-icon.linkedin  { background: #0A66C2; }
+.platform-icon.threads   { background: #111; }
+.platform-icon img       { filter: brightness(0) invert(1); }
 
 .datetime-picker {
   display: flex;
@@ -1830,9 +1829,6 @@ h6 { font-size: var(--font-size-base); }
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
 }
 
-/* Platform icon colors */
-.platform-icon.facebook { background: #E7F3FF; color: #1877F2; }
-.platform-icon.twitter  { background: #E8F5FE; color: #1DA1F2; }
 
 @keyframes modalSlideUp {
   from { transform: translateY(24px); opacity: 0; }

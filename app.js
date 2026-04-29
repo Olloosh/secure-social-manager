@@ -793,8 +793,8 @@ function renderPosts() {
     return;
   }
   list.innerHTML = posts.map(p => {
-    const iconColor = p.platform === 'telegram' ? '0088CC' : p.platform === 'instagram' ? 'E4405F' : p.platform === 'facebook' ? '1877F2' : '999999';
-    const icon = `<img src="https://cdn.simpleicons.org/${p.platform}/${iconColor}" alt="${p.platform}" style="width:24px;height:24px;">`;
+    const iconBg = p.platform === 'telegram' ? '#29B6F6' : p.platform === 'instagram' ? 'linear-gradient(135deg,#f09433,#dc2743)' : p.platform === 'facebook' ? '#1877F2' : '#888';
+    const icon = `<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:5px;background:${iconBg};flex-shrink:0;"><img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/${p.platform}.svg" alt="${p.platform}" style="width:14px;height:14px;filter:brightness(0) invert(1);"></span>`;
     const statusBadge = p.status === 'published'
       ? '<span class="badge badge-success">✓ Yuklandi</span>'
       : p.status === 'failed'
@@ -1258,9 +1258,9 @@ document.getElementById('save-account-btn')?.addEventListener('click', () => {
 // Platform Connect — gramir.uz style
 // ========================================
 const allPlatforms = [
-  { id: 'telegram',  name: 'Telegram',  icon: '<img src="https://cdn.simpleicons.org/telegram/ffffff" alt="Telegram" style="width:60%;height:60%;">', iconBg: '#29B6F6', tagline: 'Kanal va guruhlaringizni ulang', btnColor: '#29B6F6', btnText: 'Telegram hisobini ulash'  },
-  { id: 'instagram', name: 'Instagram', icon: '<img src="https://cdn.simpleicons.org/instagram/ffffff" alt="Instagram" style="width:60%;height:60%;">', iconBg: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', tagline: 'Instagram biznes hisobingizni ulang', btnColor: 'linear-gradient(135deg,#e6683c,#cc2366)', btnText: 'Instagram hisobini ulash' },
-  { id: 'facebook',  name: 'Facebook',  icon: '<img src="https://cdn.simpleicons.org/facebook/ffffff" alt="Facebook" style="width:60%;height:60%;">', iconBg: '#1877F2', tagline: 'Facebook sahifangizni ulang', btnColor: '#1877F2', btnText: 'Facebook hisobini ulash'  },
+  { id: 'telegram',  name: 'Telegram',  icon: '<img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/telegram.svg" alt="Telegram" style="width:60%;height:60%;filter:brightness(0) invert(1);">', iconBg: '#29B6F6', tagline: 'Kanal va guruhlaringizni ulang', btnColor: '#29B6F6', btnText: 'Telegram hisobini ulash'  },
+  { id: 'instagram', name: 'Instagram', icon: '<img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/instagram.svg" alt="Instagram" style="width:60%;height:60%;filter:brightness(0) invert(1);">', iconBg: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', tagline: 'Instagram biznes hisobingizni ulang', btnColor: 'linear-gradient(135deg,#e6683c,#cc2366)', btnText: 'Instagram hisobini ulash' },
+  { id: 'facebook',  name: 'Facebook',  icon: '<img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/facebook.svg" alt="Facebook" style="width:60%;height:60%;filter:brightness(0) invert(1);">', iconBg: '#1877F2', tagline: 'Facebook sahifangizni ulang', btnColor: '#1877F2', btnText: 'Facebook hisobini ulash'  },
   { id: 'linkedin',  name: 'LinkedIn',  icon: 'in', iconBg: '#0A66C2',                                                              tagline: 'LinkedIn kompaniya sahifangizni ulang',    btnColor: '#0A66C2',                                         btnText: 'LinkedIn hisobini ulash'  },
   { id: 'youtube',   name: 'YouTube',   icon: '▶',  iconBg: '#FF0000',                                                              tagline: 'YouTube kanalingizni ulang',               btnColor: '#FF0000',                                         btnText: 'YouTube hisobini ulash'   },
   { id: 'twitter',   name: 'X',         icon: '✕',  iconBg: '#111',                                                                  tagline: 'X (Twitter) hisobingizni ulang',           btnColor: '#111',                                            btnText: 'X hisobini ulash'         },
@@ -1520,7 +1520,7 @@ function mountTelegramWidget() {
       width:100%;padding:0.85rem 1.2rem;margin-top:1rem;
       background:#29B6F6;color:#fff;border:none;border-radius:10px;
       font-size:1rem;font-weight:600;cursor:pointer;">
-      <img src="https://cdn.simpleicons.org/telegram/ffffff" style="width:20px;height:20px;">
+      <img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/telegram.svg" style="width:20px;height:20px;filter:brightness(0) invert(1);">
       Telegram hisobini ulash
     </button>`;
 
