@@ -1178,53 +1178,45 @@ function loadFacebookSDK() {
   return fbSdkReady;
 }
 
-// ── Telegram Login Widget (injects official script) ─────
+// ── Telegram: simple username form (demo-friendly) ──────
 function mountTelegramWidget() {
   const slot = document.getElementById('telegram-widget-slot');
   const warn = document.getElementById('detail-config-warn');
   const btn  = document.getElementById('detail-connect-btn');
   if (!slot) return;
-  slot.innerHTML = '';
-
-  if (!CFG.TELEGRAM_BOT_USERNAME) {
-    slot.classList.add('hidden');
-    warn.classList.remove('hidden');
-    warn.innerHTML = '⚠️ <code>oauth-config.js</code> da <code>TELEGRAM_BOT_USERNAME</code> to\'ldirilmagan. @BotFather dan bot yaratib, username kiriting.';
-    btn.style.display = 'none';
-    return;
-  }
 
   warn.classList.add('hidden');
-  btn.style.display = 'none';           // widget o'zi tugma ko'rsatadi
+  btn.style.display = 'none';   // form o'zida tugma bor
   slot.classList.remove('hidden');
+  slot.innerHTML = `
+    <div style="margin-top:1rem;">
+      <label style="display:block;font-size:0.85rem;color:#aaa;margin-bottom:0.5rem;">
+        Telegram kanal yoki username
+      </label>
+      <div style="display:flex;gap:0.5rem;">
+        <input id="tg-username-input" type="text"
+          placeholder="@username yoki kanal nomi"
+          style="flex:1;padding:0.6rem 0.9rem;border-radius:8px;border:1px solid #444;
+                 background:#1e2130;color:#fff;font-size:0.95rem;outline:none;">
+        <button id="tg-connect-submit"
+          style="padding:0.6rem 1.1rem;border-radius:8px;background:#29B6F6;
+                 color:#fff;border:none;font-weight:600;cursor:pointer;font-size:0.95rem;">
+          Ulash
+        </button>
+      </div>
+      <p style="font-size:0.78rem;color:#888;margin-top:0.5rem;">
+        Misol: @mychannel yoki mychannel_uz
+      </p>
+    </div>`;
 
-  const s = document.createElement('script');
-  s.async = true;
-  s.src = 'https://telegram.org/js/telegram-widget.js?22';
-  s.setAttribute('data-telegram-login', CFG.TELEGRAM_BOT_USERNAME);
-  s.setAttribute('data-size',           'large');
-  s.setAttribute('data-radius',         '10');
-  s.setAttribute('data-onauth',         'onTelegramAuth(user)');
-  s.setAttribute('data-request-access', 'write');
-  slot.appendChild(s);
-}
-
-// ── Telegram auth callback (called from widget iframe) ───
-window.handleTelegramAuth = function (user) {
-  // Telegram signs the payload with bot token's SHA-256 HMAC.
-  // Signature verification MUST be done server-side with the bot token.
-  // Client-side we trust the origin (telegram.org iframe) for the demo.
-  saveOAuth('telegram', {
-    user_id:    user.id,
-    username:   user.username,
-    first_name: user.first_name,
-    last_name:  user.last_name,
-    photo_url:  user.photo_url,
-    auth_date:  user.auth_date,
-    hash:       user.hash,            // server pass this to Bot API for verification
+  document.getElementById('tg-connect-submit')?.addEventListener('click', () => {
+    let val = (document.getElementById('tg-username-input')?.value || '').trim();
+    if (!val) { showToast('Username kiriting', 'error'); return; }
+    if (!val.startsWith('@')) val = '@' + val;
+    saveOAuth('telegram', { username: val, connected_at: Date.now() });
+    showSuccessAndClose('Telegram', val);
   });
-  showSuccessAndClose('Telegram', user.username || user.first_name);
-};
+}
 
 // ── Facebook login flow ──────────────────────────────────
 async function loginWithFacebook() {
