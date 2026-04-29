@@ -1178,40 +1178,67 @@ function loadFacebookSDK() {
   return fbSdkReady;
 }
 
-// ── Telegram Login Widget ────────────────────────────────
+// ── Telegram OAuth popup (Facebook-style) ───────────────
 function mountTelegramWidget() {
   const slot = document.getElementById('telegram-widget-slot');
   const warn = document.getElementById('detail-config-warn');
   const btn  = document.getElementById('detail-connect-btn');
   if (!slot) return;
   slot.innerHTML = '';
-
   warn.classList.add('hidden');
-  btn.style.display = 'none';
-  slot.classList.remove('hidden');
-
-  const s = document.createElement('script');
-  s.async = true;
-  s.src = 'https://telegram.org/js/telegram-widget.js?22';
-  s.setAttribute('data-telegram-login', 'securesocialmanager_bot');
-  s.setAttribute('data-size',           'large');
-  s.setAttribute('data-radius',         '10');
-  s.setAttribute('data-onauth',         'onTelegramAuth(user)');
-  s.setAttribute('data-request-access', 'write');
-  slot.appendChild(s);
+  slot.classList.add('hidden');
+  btn.style.display = '';   // show the main connect button
 }
 
-window.handleTelegramAuth = function (user) {
-  saveOAuth('telegram', {
-    user_id:    user.id,
-    username:   user.username,
-    first_name: user.first_name,
-    last_name:  user.last_name,
-    photo_url:  user.photo_url,
-    auth_date:  user.auth_date,
-  });
-  showSuccessAndClose('Telegram', user.username || user.first_name);
-};
+function openTelegramPopup() {
+  const botId  = CFG.TELEGRAM_BOT_ID;
+  const origin = encodeURIComponent(window.location.origin);
+  const url    = `https://oauth.telegram.org/auth?bot_id=${botId}&origin=${origin}&embed=1&request_access=write`;
+
+  const w = 550, h = 500;
+  const left = Math.round((screen.width  - w) / 2);
+  const top  = Math.round((screen.height - h) / 2);
+  const popup = window.open(url, 'tg_oauth',
+    `width=${w},height=${h},left=${left},top=${top},toolbar=0,location=0,status=0,menubar=0,scrollbars=1`);
+
+  if (!popup) {
+    showToast('Popup bloklandi — brauzerda popup ruxsat bering', 'warning');
+    return;
+  }
+
+  showLoading('Telegram');
+
+  function onMessage(e) {
+    if (e.origin !== 'https://oauth.telegram.org') return;
+    cleanup();
+    if (!popup.closed) popup.close();
+    const user = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+    if (user && user.id) {
+      saveOAuth('telegram', {
+        user_id:    user.id,
+        username:   user.username,
+        first_name: user.first_name,
+        last_name:  user.last_name,
+        photo_url:  user.photo_url,
+        auth_date:  user.auth_date,
+      });
+      showSuccessAndClose('Telegram', user.username || user.first_name);
+    } else {
+      showError('Telegram ulash bekor qilindi');
+    }
+  }
+
+  const timer = setInterval(() => {
+    if (popup.closed) { cleanup(); showModalStep('detail'); }
+  }, 600);
+
+  function cleanup() {
+    clearInterval(timer);
+    window.removeEventListener('message', onMessage);
+  }
+
+  window.addEventListener('message', onMessage);
+}
 
 // ── Facebook login flow ──────────────────────────────────
 async function loginWithFacebook() {
@@ -1284,6 +1311,12 @@ function showError(msg) {
 document.getElementById('detail-connect-btn')?.addEventListener('click', async () => {
   const p = allPlatforms.find(x => x.id === currentPlatform);
   if (!p) return;
+
+  // TELEGRAM
+  if (p.id === 'telegram') {
+    openTelegramPopup();
+    return;
+  }
 
   // FACEBOOK
   if (p.id === 'facebook') {

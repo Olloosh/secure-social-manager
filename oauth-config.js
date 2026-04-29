@@ -21,6 +21,7 @@
    ───────────────────────────────────────────────────────────── */
 window.OAUTH_CONFIG = {
   TELEGRAM_BOT_USERNAME: 'securesocialmanager_bot',
+  TELEGRAM_BOT_ID:       '8506396231',
   FACEBOOK_APP_ID:       '1487980476353532',  // Social Manager app
 
   // Permissions we ask for. Leave as-is unless you know why
