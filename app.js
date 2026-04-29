@@ -281,6 +281,11 @@ const ADMIN_PASSWORD = 'admin123';
 
 function isAdmin(email) { return (email || '').toLowerCase() === ADMIN_EMAIL; }
 
+function isValidEmail(email) {
+  // Must have text @ text . tld(2+ chars)
+  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(email);
+}
+
 async function sha256(str) {
   const buf = new TextEncoder().encode(str);
   const hash = await crypto.subtle.digest('SHA-256', buf);
@@ -363,6 +368,12 @@ document.getElementById('login-form')?.addEventListener('submit', async (e) => {
   const password = document.getElementById('login-password').value;
   if (!email || !password) return;
 
+  if (!isValidEmail(email)) {
+    setFieldError('login-email', 'Email noto\'g\'ri formatda (masalan: ism@gmail.com)');
+    shakeForm('login-form');
+    return;
+  }
+
   const users = loadUsers();
   const user  = users[email];
 
@@ -412,6 +423,12 @@ document.getElementById('register-form')?.addEventListener('submit', async (e) =
   const email    = document.getElementById('register-email').value.trim().toLowerCase();
   const password = document.getElementById('register-password').value;
   if (!email || !password) return;
+
+  if (!isValidEmail(email)) {
+    setFieldError('register-email', 'Email noto\'g\'ri formatda (masalan: ism@gmail.com)');
+    shakeForm('register-form');
+    return;
+  }
 
   if (password.length < 6) {
     setFieldError('register-password', 'Parol kamida 6 ta belgi bo\'lishi kerak');
@@ -1278,9 +1295,10 @@ function mountTelegramWidget() {
 }
 
 function openTelegramPopup() {
-  const botId  = CFG.TELEGRAM_BOT_ID;
-  const origin = encodeURIComponent(window.location.origin);
-  const url    = `https://oauth.telegram.org/auth?bot_id=${botId}&origin=${origin}&embed=1&request_access=write`;
+  const botId    = CFG.TELEGRAM_BOT_ID;
+  const origin   = window.location.origin;
+  const returnTo = encodeURIComponent(origin + window.location.pathname + '?tg_auth=1');
+  const url      = `https://oauth.telegram.org/auth?bot_id=${botId}&origin=${encodeURIComponent(origin)}&embed=1&request_access=write&return_to=${returnTo}`;
 
   const w = 550, h = 500;
   const left = Math.round((screen.width  - w) / 2);
@@ -1295,11 +1313,14 @@ function openTelegramPopup() {
 
   showLoading('Telegram');
 
+  // Telegram redirects the popup to return_to URL with auth data as query params.
+  // The popup page (our own page) detects ?tg_auth=1 on load and postMessages back.
   function onMessage(e) {
-    if (e.origin !== 'https://oauth.telegram.org') return;
+    if (e.origin !== window.location.origin) return;
+    if (!e.data || e.data.type !== 'tg_auth') return;
     cleanup();
     if (!popup.closed) popup.close();
-    const user = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+    const user = e.data.user;
     if (user && user.id) {
       saveOAuth('telegram', {
         user_id:    user.id,
@@ -1735,6 +1756,18 @@ window.addAndSwitchAccount = function (...args) {
 // Initialize
 // ========================================
 document.addEventListener('DOMContentLoaded', async () => {
+  // ── Telegram OAuth callback: popup landed on ?tg_auth=1 ──
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('tg_auth') === '1' && window.opener) {
+    const user = {};
+    ['id','first_name','last_name','username','photo_url','auth_date','hash'].forEach(k => {
+      if (params.get(k)) user[k] = params.get(k);
+    });
+    window.opener.postMessage({ type: 'tg_auth', user }, window.location.origin);
+    window.close();
+    return;
+  }
+
   await seedAdmin();
   refreshAdminNav();
 
