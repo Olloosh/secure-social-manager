@@ -925,6 +925,16 @@
                       </div>
                       <button class="btn btn-primary platform-action-btn" style="margin-left: auto;" data-action="connect" data-platform="telegram">Ulash</button>
                     </div>
+                    <!-- Telegram bot config (shown when connected) -->
+                    <div id="telegram-config" class="hidden" style="background:var(--color-gray-50);border-radius:8px;padding:1rem 1.1rem;margin-top:-0.25rem;margin-bottom:0.5rem;border:1px solid var(--color-gray-200);">
+                      <p style="font-size:0.82rem;font-weight:600;margin:0 0 0.6rem;color:var(--color-gray-700);">🤖 Bot sozlamalari (kanalga yuborish uchun)</p>
+                      <p style="font-size:0.78rem;color:var(--color-gray-500);margin:0 0 0.75rem;">BotFather dan token oling va botni kanalga admin qiling</p>
+                      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                        <input type="password" id="tg-bot-token" class="form-input" placeholder="Bot token: 123456:AAH..." style="font-size:0.85rem;">
+                        <input type="text" id="tg-channel" class="form-input" placeholder="Kanal: @mychannel yoki -100123456" style="font-size:0.85rem;">
+                        <button class="btn btn-primary btn-sm" id="save-tg-config" style="align-self:flex-start;padding:0.45rem 1rem;">💾 Saqlash</button>
+                      </div>
+                    </div>
 
                     <!-- Instagram -->
                     <div class="platform-connection" id="platform-instagram" style="opacity:0.65;">

@@ -837,27 +837,110 @@ document.getElementById('posts-list')?.addEventListener('click', (e) => {
 });
 
 // ────────────────────────────────────────────────────────────
-// Real Facebook post attempt (best-effort — requires publish scope)
-// ────────────────────────────────────────────────────────────
-async function tryPublishFacebook(content) {
+// ─── Telegram Bot API posting ────────────────────────────
+const TG_CONFIG_KEY = 'ssm_tg_config';
+
+function saveTgConfig(cfg) {
+  localStorage.setItem(TG_CONFIG_KEY, JSON.stringify(cfg));
+}
+function getTgConfig() {
+  try { return JSON.parse(localStorage.getItem(TG_CONFIG_KEY) || '{}'); } catch { return {}; }
+}
+
+async function tryPublishTelegram(content, imgUrl) {
+  const cfg = getTgConfig();
+  if (!cfg.botToken) throw new Error('Telegram bot token kiritilmagan — Sozlamalar → Platformalar da saqlang');
+  if (!cfg.channel)  throw new Error('Telegram kanal nomi kiritilmagan — @kanal_nomi yoki chat ID');
+
+  const base = `https://api.telegram.org/bot${cfg.botToken}`;
+
+  if (imgUrl && imgUrl.startsWith('http')) {
+    const r = await fetch(`${base}/sendPhoto`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: cfg.channel, photo: imgUrl, caption: content }),
+    });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.description || 'Telegram xatolik');
+    return j;
+  } else {
+    const r = await fetch(`${base}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: cfg.channel, text: content }),
+    });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.description || 'Telegram xatolik');
+    return j;
+  }
+}
+
+// ─── Instagram Graph API posting ─────────────────────────
+async function tryPublishInstagram(content, imgUrl) {
+  const tok = getOAuth('instagram');
+  if (!tok || !tok.access_token) throw new Error('Instagram ulangan emas');
+
+  // Step 1: get IG business account via FB API
+  const fbSdk = await loadFacebookSDK();
+  const igUser = await new Promise((res, rej) => {
+    FB.api('/me/accounts', { fields: 'instagram_business_account,name', access_token: tok.access_token }, (r) => {
+      if (!r || r.error) return rej(new Error(r?.error?.message || 'Facebook sahifalar topilmadi'));
+      const page = (r.data || []).find(p => p.instagram_business_account);
+      if (!page) return rej(new Error('Instagram Business akkaunt topilmadi — Facebook Sahifaga bog\'liq IG kerak'));
+      res(page.instagram_business_account.id);
+    });
+  });
+
+  // Step 2: create media container
+  const mediaParams = imgUrl && imgUrl.startsWith('http')
+    ? { image_url: imgUrl, caption: content, access_token: tok.access_token }
+    : { media_type: 'IMAGE', image_url: 'https://via.placeholder.com/400', caption: content, access_token: tok.access_token };
+
+  const container = await new Promise((res, rej) => {
+    FB.api(`/${igUser}/media`, 'POST', mediaParams, (r) => {
+      if (!r || r.error) return rej(new Error(r?.error?.message || 'IG media yaratishda xatolik'));
+      res(r.id);
+    });
+  });
+
+  // Step 3: publish
+  return new Promise((res, rej) => {
+    FB.api(`/${igUser}/media_publish`, 'POST',
+      { creation_id: container, access_token: tok.access_token },
+      (r) => {
+        if (!r || r.error) return rej(new Error(r?.error?.message || 'IG publish xatolik'));
+        res(r);
+      });
+  });
+}
+
+// ─── Unified publish function ─────────────────────────────
+async function publishNow(platform, content, imgUrl) {
+  if (platform === 'facebook')  return tryPublishFacebook(content, imgUrl);
+  if (platform === 'telegram')  return tryPublishTelegram(content, imgUrl);
+  if (platform === 'instagram') return tryPublishInstagram(content, imgUrl);
+  throw new Error(`${platform} uchun hozircha to'g'ridan-to'g'ri yuborish qo'llab-quvvatlanmaydi`);
+}
+
+// ─── Facebook Graph API posting ──────────────────────────
+async function tryPublishFacebook(content, imgUrl) {
   const tok = getOAuth('facebook');
   if (!tok || !tok.accessToken) {
-    throw new Error('Facebook ulangan emas — Settings → Platforms da ulang');
+    throw new Error('Facebook ulangan emas — Sozlamalar → Platformalar da ulang');
   }
-  if (!window.FB) {
-    throw new Error('Facebook SDK hali yuklanmagan');
-  }
+  if (!window.FB) throw new Error('Facebook SDK hali yuklanmagan');
+
+  // Try first page if available, else post to personal feed
+  const pageToken = tok.pages && tok.pages[0] ? tok.pages[0].access_token : tok.accessToken;
+  const pageId    = tok.pages && tok.pages[0] ? tok.pages[0].id : 'me';
+
   return new Promise((resolve, reject) => {
-    FB.api('/me/feed', 'POST',
-      { message: content, access_token: tok.accessToken },
-      (res) => {
-        if (!res || res.error) {
-          reject(new Error(res?.error?.message || 'Facebook xatolik'));
-        } else {
-          resolve(res);
-        }
-      }
-    );
+    const params = { message: content, access_token: pageToken };
+    if (imgUrl && imgUrl.startsWith('http')) params.link = imgUrl;
+    FB.api(`/${pageId}/feed`, 'POST', params, (res) => {
+      if (!res || res.error) reject(new Error(res?.error?.message || 'Facebook xatolik'));
+      else resolve(res);
+    });
   });
 }
 
@@ -900,17 +983,17 @@ document.getElementById('create-post-form')?.addEventListener('submit', async (e
     error: null,
   };
 
-  // Real Facebook attempt (only if user explicitly picked Facebook AND scheduled for now/past)
   const postNow = !scheduledAt || scheduledAt <= Date.now() + 60_000;
-  if (platform === 'facebook' && postNow) {
+  if (postNow && ['facebook', 'telegram', 'instagram'].includes(platform)) {
     try {
-      await tryPublishFacebook(content);
+      const imgUrl = pendingMedia?.type === 'image' ? pendingMedia.dataUrl : null;
+      await publishNow(platform, content, imgUrl);
       post.status = 'published';
-      showToast('Facebook ga yuborildi ✓', 'success');
+      showToast(`${platform.charAt(0).toUpperCase()+platform.slice(1)} ga yuborildi ✓`, 'success');
     } catch (err) {
       post.status = 'failed';
       post.error  = err.message;
-      showToast('Facebook xatolik: ' + err.message, 'error');
+      showToast(`Xatolik: ${err.message}`, 'error');
     }
   } else {
     showToast(`Post ${new Date(scheduledAt || Date.now()).toLocaleString()} ga rejalashtirildi 📅`, 'success');
@@ -1444,6 +1527,15 @@ function connectPlatform(id) {
       <button class="btn btn-outline platform-action-btn" style="margin-left:auto;"
         data-action="disconnect" data-platform="${id}">Uzish</button>`;
   }
+  if (id === 'telegram') {
+    const cfg = document.getElementById('telegram-config');
+    if (cfg) {
+      cfg.classList.remove('hidden');
+      const saved = getTgConfig();
+      if (saved.botToken) document.getElementById('tg-bot-token').value = saved.botToken;
+      if (saved.channel)  document.getElementById('tg-channel').value  = saved.channel;
+    }
+  }
   updatePlatformCounter(+1);
   showToast(`${p?.name} muvaffaqiyatli ulandi!`, 'success');
 }
@@ -1462,6 +1554,9 @@ function disconnectPlatform(id) {
       <button class="btn btn-primary platform-action-btn" style="margin-left:auto;"
         data-action="connect" data-platform="${id}">Ulash</button>`;
   }
+  if (id === 'telegram') {
+    document.getElementById('telegram-config')?.classList.add('hidden');
+  }
   updatePlatformCounter(-1);
   showToast(`${p?.name} ulanishi uzildi`, 'warning');
 }
@@ -1476,6 +1571,16 @@ function updatePlatformCounter(delta) {
 }
 
 // ========================================
+// ── Telegram config save ──────────────────────────────────
+document.getElementById('save-tg-config')?.addEventListener('click', () => {
+  const token   = document.getElementById('tg-bot-token')?.value.trim();
+  const channel = document.getElementById('tg-channel')?.value.trim();
+  if (!token)   { showToast('Bot token bo\'sh bo\'lmasligi kerak', 'error'); return; }
+  if (!channel) { showToast('Kanal nomi bo\'sh bo\'lmasligi kerak', 'error'); return; }
+  saveTgConfig({ botToken: token, channel });
+  showToast('Telegram sozlamalari saqlandi ✓', 'success');
+});
+
 // Mobile Sidebar Toggle
 // ========================================
 const hamburgerBtn = document.getElementById('hamburger-btn');
@@ -1931,10 +2036,16 @@ function renderParserResults(channel, posts) {
                 <label style="font-size:0.78rem;color:var(--color-gray-500);display:block;margin-bottom:0.3rem;">Vaqt</label>
                 <input type="time" class="form-input parser-time-inp" value="${defaultTime}" style="padding:0.45rem 0.6rem;font-size:0.85rem;">
               </div>
-              <button class="btn btn-primary parser-schedule-btn" data-idx="${i}"
-                      style="padding:0.45rem 0.9rem;font-size:0.85rem;white-space:nowrap;">
-                ✅ Rejalashtirish
-              </button>
+              <div style="display:flex;gap:0.4rem;">
+                <button class="btn btn-outline parser-now-btn" data-idx="${i}"
+                        style="padding:0.45rem 0.9rem;font-size:0.85rem;white-space:nowrap;">
+                  ⚡ Hoziroq
+                </button>
+                <button class="btn btn-primary parser-schedule-btn" data-idx="${i}"
+                        style="padding:0.45rem 0.9rem;font-size:0.85rem;white-space:nowrap;">
+                  📅 Rejalashtirish
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1965,7 +2076,50 @@ function renderParserResults(channel, posts) {
     });
   });
 
-  // "Rejalashtirish" — save post
+  // "Hoziroq yuklash" — publish immediately via API
+  list.querySelectorAll('.parser-now-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const i        = +btn.dataset.idx;
+      const p        = posts[i];
+      const panel    = document.getElementById(`parser-upload-${i}`);
+      const platform = panel.querySelector('.parser-platform-sel').value;
+
+      if (!platform) { showToast('Platforma tanlang', 'error'); return; }
+
+      const card    = document.getElementById(`parser-card-${i}`);
+      btn.textContent = '⏳ Yuborilmoqda...';
+      btn.disabled = true;
+
+      try {
+        await publishNow(platform, p.text, p.imgUrl || null);
+
+        // Save as published
+        const email = getSession();
+        const saved = loadPosts(email);
+        saved.unshift({
+          id: Date.now(), platform, content: p.text,
+          media: p.imgUrl ? { type: 'image', dataUrl: p.imgUrl } : null,
+          scheduledAt: null, createdAt: Date.now(), status: 'published', source: 'parser',
+        });
+        savePosts(email, saved);
+
+        panel.classList.add('hidden');
+        card.style.opacity = '0.5';
+        const uploadBtnEl = card.querySelector('.parser-upload-btn');
+        uploadBtnEl.textContent = '✓ Yuborildi';
+        uploadBtnEl.disabled = true;
+        uploadBtnEl.className = 'btn btn-outline btn-sm';
+        btn.textContent = '✓ Yuborildi';
+        showToast(`${platform} ga muvaffaqiyatli yuborildi ✓`, 'success');
+      } catch (err) {
+        btn.textContent = '⚡ Hoziroq';
+        btn.disabled = false;
+        showToast('Xatolik: ' + err.message, 'error');
+      }
+    });
+  });
+
+  // "Rejalashtirish" — save post with scheduled time
   list.querySelectorAll('.parser-schedule-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const i       = +btn.dataset.idx;
@@ -1981,26 +2135,20 @@ function renderParserResults(channel, posts) {
       const email = getSession();
       const saved = loadPosts(email);
       saved.unshift({
-        id:        Date.now(),
-        platform,
-        content:   p.text,
-        media:     p.imgUrl ? { type: 'image', dataUrl: p.imgUrl } : null,
-        date,
-        time,
-        status:    'scheduled',
-        source:    'parser',
-        created_at: Date.now(),
+        id: Date.now(), platform, content: p.text,
+        media: p.imgUrl ? { type: 'image', dataUrl: p.imgUrl } : null,
+        scheduledAt: new Date(`${date}T${time}`).getTime(),
+        createdAt: Date.now(), status: 'scheduled', source: 'parser',
       });
       savePosts(email, saved);
 
-      // Visual feedback on card
       panel.classList.add('hidden');
       const card = document.getElementById(`parser-card-${i}`);
       card.style.opacity = '0.5';
-      const uploadBtn = card.querySelector('.parser-upload-btn');
-      uploadBtn.textContent = '✓ Rejalashtirildi';
-      uploadBtn.disabled = true;
-      uploadBtn.className = 'btn btn-outline btn-sm';
+      const uploadBtnEl = card.querySelector('.parser-upload-btn');
+      uploadBtnEl.textContent = '✓ Rejalashtirildi';
+      uploadBtnEl.disabled = true;
+      uploadBtnEl.className = 'btn btn-outline btn-sm';
 
       showToast(`Post ${platform} uchun ${date} ${time} ga rejalashtirildi ✓`, 'success');
     });
