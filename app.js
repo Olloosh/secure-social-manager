@@ -1371,30 +1371,24 @@ async function loginWithFacebook() {
   });
 }
 
-// ── Instagram login flow (via Facebook) ──────────────────
+// ── Instagram login flow (via Facebook SDK) ──────────────
 async function loginWithInstagram() {
   const FB = await loadFacebookSDK();
   return new Promise((resolve, reject) => {
-    FB.login(async (resp) => {
-      if (resp.status !== 'connected') return reject(new Error('Instagram login cancelled'));
+    FB.login((resp) => {
+      if (resp.status !== 'connected') return reject(new Error('Instagram login bekor qilindi'));
       const token = resp.authResponse.accessToken;
-      FB.api('/me/accounts', { fields: 'id,name,access_token,instagram_business_account{id,username,profile_picture_url}' }, (pages) => {
-        const page = (pages.data || []).find(p => p.instagram_business_account);
-        if (!page) {
-          return reject(new Error('Instagram Business akkaunt topilmadi. Instagram\'ni Facebook Page bilan bog\'lang.'));
-        }
-        const ig = page.instagram_business_account;
+      // Try to get Instagram username via connected IG accounts; fall back to FB name
+      FB.api('/me', { fields: 'id,name,picture,instagram_accounts{username,profile_picture_url}' }, (me) => {
+        const igAccount = me.instagram_accounts?.data?.[0];
         resolve({
-          access_token:    token,
-          page_access_token: page.access_token,
-          page_id:         page.id,
-          page_name:       page.name,
-          ig_user_id:      ig.id,
-          username:        ig.username,
-          avatar:          ig.profile_picture_url,
+          access_token: token,
+          user_id:      me.id,
+          username:     igAccount?.username || me.name,
+          avatar:       igAccount?.profile_picture_url || me.picture?.data?.url,
         });
       });
-    }, { scope: CFG.INSTAGRAM_SCOPES, return_scopes: true });
+    }, { scope: 'public_profile,instagram_basic', return_scopes: true });
   });
 }
 
