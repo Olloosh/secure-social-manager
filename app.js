@@ -1518,22 +1518,29 @@ function loadFacebookSDK() {
 
 // ── Telegram OAuth popup (Facebook-style) ───────────────
 function mountTelegramWidget() {
-  const slot = document.getElementById('telegram-widget-slot');
-  const warn = document.getElementById('detail-config-warn');
+  const slot    = document.getElementById('telegram-widget-slot');
+  const warn    = document.getElementById('detail-config-warn');
   const mainBtn = document.getElementById('detail-connect-btn');
   if (!slot) return;
 
-  warn.classList.add('hidden');
-  mainBtn.style.display = 'none';   // hide main btn; slot has its own
+  if (warn)    warn.classList.add('hidden');
+  if (mainBtn) mainBtn.style.display = 'none';
   slot.classList.remove('hidden');
 
-  const botId    = CFG.TELEGRAM_BOT_ID;
+  const botId = CFG.TELEGRAM_BOT_ID;
+
+  // Show error if config not injected yet
+  if (!botId || botId.startsWith('__')) {
+    slot.innerHTML = `<p style="color:#ef4444;font-size:0.85rem;margin-top:0.75rem;padding:0.75rem;background:#fef2f2;border-radius:8px;">
+      ⚠️ Telegram Bot ID sozlanmagan — Netlify dashboard da <b>TG_BOT_ID</b> env var qo'shing va qayta deploy qiling.
+    </p>`;
+    return;
+  }
+
   const origin   = window.location.origin;
-  const returnTo = encodeURIComponent(origin + window.location.pathname + '?tg_auth=1');
+  const returnTo = encodeURIComponent(origin + '/?tg_auth=1');
   const url      = `https://oauth.telegram.org/auth?bot_id=${botId}&origin=${encodeURIComponent(origin)}&embed=1&request_access=write&return_to=${returnTo}`;
 
-  // Render a button inside the slot with a SYNCHRONOUS click handler so
-  // Chrome's popup blocker treats it as a direct user gesture.
   slot.innerHTML = `
     <button id="tg-popup-btn" style="
       display:flex;align-items:center;justify-content:center;gap:0.6rem;
@@ -1544,8 +1551,6 @@ function mountTelegramWidget() {
       Telegram hisobini ulash
     </button>`;
 
-  // Direct redirect — no popup needed, Chrome can't block it.
-  // Telegram will send auth data as query params to return_to URL.
   document.getElementById('tg-popup-btn').addEventListener('click', () => {
     window.location.href = url;
   });
@@ -1616,11 +1621,8 @@ document.getElementById('detail-connect-btn')?.addEventListener('click', async (
   const p = allPlatforms.find(x => x.id === currentPlatform);
   if (!p) return;
 
-  // TELEGRAM
-  if (p.id === 'telegram') {
-    openTelegramPopup();
-    return;
-  }
+  // TELEGRAM — handled by the button inside telegram-widget-slot
+  if (p.id === 'telegram') return;
 
   // FACEBOOK
   if (p.id === 'facebook') {
