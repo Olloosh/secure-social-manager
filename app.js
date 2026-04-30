@@ -947,13 +947,13 @@ async function publishNow(platform, content, imgUrl) {
 // ─── Facebook Graph API posting ──────────────────────────
 async function tryPublishFacebook(content, imgUrl) {
   const tok = getOAuth('facebook');
-  if (!tok || !tok.accessToken) {
+  if (!tok || !tok.access_token) {
     throw new Error('Facebook ulangan emas — Sozlamalar → Platformalar da ulang');
   }
-  if (!window.FB) throw new Error('Facebook SDK hali yuklanmagan');
+  if (!window.FB) await loadFacebookSDK();
 
   // Try first page if available, else post to personal feed
-  const pageToken = tok.pages && tok.pages[0] ? tok.pages[0].access_token : tok.accessToken;
+  const pageToken = tok.pages && tok.pages[0] ? tok.pages[0].access_token : tok.access_token;
   const pageId    = tok.pages && tok.pages[0] ? tok.pages[0].id : 'me';
 
   return new Promise((resolve, reject) => {
