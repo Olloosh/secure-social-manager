@@ -62,7 +62,6 @@ const sections = {
   'create-post':document.getElementById('section-create-post'),
   analytics:    document.getElementById('section-analytics'),
   settings:     document.getElementById('section-settings'),
-  parser:       document.getElementById('section-parser'),
   admin:        document.getElementById('section-admin')
 };
 
@@ -133,7 +132,6 @@ function showSection(sectionName) {
     'create-post':'Post yaratish',
     analytics:    'Statistika',
     settings:     'Sozlamalar',
-    parser:       'Parser',
     admin:        'Admin paneli'
   };
 
@@ -2085,22 +2083,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     showToast(`${pendingConnect.charAt(0).toUpperCase() + pendingConnect.slice(1)} muvaffaqiyatli ulandi! ✓`, 'success');
   }
 
-  // ── Parser section ────────────────────────────────────
-  initParser();
 
 });
-
-// ========================================
-// PARSER
-// ========================================
-function initParser() {
-  const fetchBtn  = document.getElementById('parser-fetch-btn');
-  const input     = document.getElementById('parser-channel');
-  if (!fetchBtn) return;
-
-  fetchBtn.addEventListener('click', runParser);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') runParser(); });
-}
 
 async function runParser() {
   const raw = (document.getElementById('parser-channel')?.value || '').trim();
