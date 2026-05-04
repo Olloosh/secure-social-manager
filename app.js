@@ -206,6 +206,24 @@ document.getElementById('go-to-login')?.addEventListener('click', (e) => {
   showPage('login');
 });
 
+// ── Terms of Service toggle ───────────────────────────────
+document.getElementById('terms-toggle-btn')?.addEventListener('click', () => {
+  const text  = document.getElementById('terms-text');
+  const arrow = document.getElementById('terms-arrow');
+  const open  = text.style.display !== 'none';
+  text.style.display  = open ? 'none' : 'block';
+  arrow.style.transform = open ? '' : 'rotate(180deg)';
+});
+
+// ── Terms checkbox → enable/disable register button ───────
+document.getElementById('terms-agree-checkbox')?.addEventListener('change', (e) => {
+  const btn = document.getElementById('register-submit-btn');
+  if (!btn) return;
+  btn.disabled = !e.target.checked;
+  btn.style.opacity = e.target.checked ? '1' : '0.5';
+  btn.style.cursor  = e.target.checked ? 'pointer' : 'not-allowed';
+});
+
 document.getElementById('clear-all-data')?.addEventListener('click', (e) => {
   e.preventDefault();
   if (!confirm('Barcha akkauntlar va ma\'lumotlar o\'chiriladi. Davom etasizmi?')) return;
@@ -1401,7 +1419,14 @@ document.getElementById('connect-modal')?.addEventListener('click', e => {
 document.getElementById('platforms-list')?.addEventListener('click', e => {
   const btn = e.target.closest('.platform-action-btn');
   if (!btn) return;
-  if (btn.dataset.action === 'connect')    openConnectModal(btn.dataset.platform);
+  if (btn.dataset.action === 'connect') {
+    if (btn.dataset.platform === 'facebook') {
+      const panel = document.getElementById('facebook-config');
+      if (panel) { panel.classList.toggle('hidden'); loadFbConfigUI(); }
+      return;
+    }
+    openConnectModal(btn.dataset.platform);
+  }
   if (btn.dataset.action === 'disconnect') disconnectPlatform(btn.dataset.platform);
 });
 

@@ -196,15 +196,30 @@
             <p class="form-hint">Kamida 8 ta belgi, harf va raqamlar aralashmasi</p>
           </div>
 
+          <!-- Terms of Service -->
           <div class="form-group">
-            <label class="toggle-switch" style="font-size: 0.875rem;">
-              <input type="checkbox" required>
-              <span class="toggle-slider"></span>
-              Foydalanish shartlari va Maxfiylik siyosatiga roziman
+            <div style="border:1px solid var(--color-gray-200);border-radius:10px;overflow:hidden;">
+              <button type="button" id="terms-toggle-btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;background:var(--color-gray-50);border:none;cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--color-gray-700);">
+                <span>📄 Foydalanish shartlari</span>
+                <span id="terms-arrow" style="transition:transform 0.2s;">▼</span>
+              </button>
+              <div id="terms-text" style="display:none;padding:1rem;font-size:0.8rem;color:var(--color-gray-600);line-height:1.6;max-height:180px;overflow-y:auto;border-top:1px solid var(--color-gray-200);">
+                <strong>Secure Social Manager — Foydalanish shartlari</strong><br><br>
+                1. <strong>Xizmat haqida.</strong> Ushbu platforma ijtimoiy tarmoq akkauntlarini boshqarish uchun mo'ljallangan. Barcha ma'lumotlar faqat sizning qurilmangizda saqlanadi.<br><br>
+                2. <strong>Maxfiylik.</strong> Biz sizning shaxsiy ma'lumotlaringizni uchinchi shaxslarga bermаymiz. Parollar SHA-256 bilan shifrlangan holda saqlanadi.<br><br>
+                3. <strong>OAuth tokenlar.</strong> Ijtimoiy tarmoq tokenlari faqat brauzeringizning localStorage da saqlanadi va serverga yuborilmaydi.<br><br>
+                4. <strong>Foydalanuvchi majburiyatlari.</strong> Siz faqat o'zingizga tegishli akkauntlarni ulashingiz va qonunchilikka zid bo'lmagan kontent joylashtirrishingiz shart.<br><br>
+                5. <strong>Mas'uliyat.</strong> Platforma foydalanuvchi tomonidan yuborilgan kontent uchun javobgar emas.<br><br>
+                6. <strong>O'zgarishlar.</strong> Shartlar istalgan vaqtda o'zgartirilishi mumkin. Davom etish orqali yangi shartlarga rozilик bildirасiz.
+              </div>
+            </div>
+            <label style="display:flex;align-items:flex-start;gap:0.6rem;margin-top:0.75rem;cursor:pointer;font-size:0.85rem;color:var(--color-gray-700);">
+              <input type="checkbox" id="terms-agree-checkbox" style="margin-top:2px;width:16px;height:16px;flex-shrink:0;cursor:pointer;" required>
+              <span>Foydalanish shartlarini o'qidim va roziman</span>
             </label>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-lg btn-block">
+          <button type="submit" class="btn btn-primary btn-lg btn-block" id="register-submit-btn" disabled style="opacity:0.5;cursor:not-allowed;">
             Xavfsiz akkaunt yaratish
           </button>
         </form>
@@ -957,6 +972,18 @@
                         <p class="platform-status-text">Ulanmagan</p>
                       </div>
                       <button class="btn btn-primary platform-action-btn" style="margin-left: auto;" data-action="connect" data-platform="facebook">Ulash</button>
+                    </div>
+                    <!-- Facebook page token config -->
+                    <div id="facebook-config" class="hidden" style="background:var(--color-gray-50);border-radius:8px;padding:1rem 1.1rem;margin-top:-0.25rem;margin-bottom:0.5rem;border:1px solid var(--color-gray-200);">
+                      <p style="font-size:0.82rem;font-weight:600;margin:0 0 0.4rem;color:var(--color-gray-700);">📘 Facebook sahifa sozlamalari</p>
+                      <p style="font-size:0.78rem;color:var(--color-gray-500);margin:0 0 0.75rem;">
+                        <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener" style="color:#1877F2;">Graph API Explorer</a> saytiga kiring → tokenni oling va pastga kiriting
+                      </p>
+                      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                        <input type="text" id="fb-page-id" class="form-input" placeholder="Page ID: 123456789" style="font-size:0.85rem;">
+                        <input type="password" id="fb-page-token" class="form-input" placeholder="Page Access Token: EAABs..." style="font-size:0.85rem;">
+                        <button class="btn btn-primary btn-sm" id="save-fb-config" style="align-self:flex-start;padding:0.45rem 1rem;">💾 Saqlash</button>
+                      </div>
                     </div>
 
                     <!-- Twitter / X -->
