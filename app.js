@@ -1600,7 +1600,7 @@ async function loginWithFacebook() {
           });
         });
       });
-    }, { scope: CFG.FACEBOOK_SCOPES, return_scopes: true });
+    }, { scope: 'public_profile,email' });
   });
 }
 
