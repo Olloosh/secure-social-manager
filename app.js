@@ -1833,6 +1833,13 @@ function switchAccount(id) {
   // Restore this account's platform connections and posts
   loadAccountState(acc.email);
 
+  // If currently on admin panel but new account is not admin, redirect
+  const currentSection = Object.keys(sections).find(k => sections[k] && !sections[k].classList.contains('hidden'));
+  if (currentSection === 'admin' && !isAdmin(acc.email)) {
+    showSection('dashboard');
+  }
+
+  refreshAdminNav();
   renderAccountList();
   closeAccountDropdown();
   showToast(`${acc.name} akkauntiga o'tildi`, 'success');
