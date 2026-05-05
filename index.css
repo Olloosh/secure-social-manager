@@ -1296,6 +1296,14 @@ h6 { font-size: var(--font-size-base); }
   display: none !important;
 }
 
+/* Admin section only visible when body has is-admin class */
+#section-admin {
+  display: none !important;
+}
+body.is-admin #section-admin {
+  display: block !important;
+}
+
 .flex {
   display: flex;
 }

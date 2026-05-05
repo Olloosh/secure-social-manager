@@ -115,7 +115,7 @@ function showSection(sectionName) {
     sectionName = 'dashboard';
   }
 
-  Object.values(sections).forEach(section => section.classList.add('hidden'));
+  Object.values(sections).forEach(section => { if (section) section.classList.add('hidden'); });
 
   const section = sections[sectionName];
   if (section) {
@@ -1896,13 +1896,26 @@ async function seedAdmin() {
   }
 }
 
-// Toggle admin nav visibility based on current session
+// Toggle admin nav + body class based on current session
 function refreshAdminNav() {
   const active = savedAccounts.find(a => a.active);
   const navAdmin = document.getElementById('nav-admin');
-  if (!navAdmin) return;
-  if (active && isAdmin(active.email)) navAdmin.classList.remove('hidden');
-  else                                 navAdmin.classList.add('hidden');
+  const adminMode = active && isAdmin(active.email);
+
+  if (navAdmin) {
+    if (adminMode) navAdmin.classList.remove('hidden');
+    else           navAdmin.classList.add('hidden');
+  }
+
+  // CSS-level guard: body.is-admin controls section-admin visibility
+  if (adminMode) document.body.classList.add('is-admin');
+  else           document.body.classList.remove('is-admin');
+
+  // If we removed admin access while on admin section, go to dashboard
+  if (!adminMode) {
+    const onAdmin = sections.admin && !sections.admin.classList.contains('hidden');
+    if (onAdmin) showSection('dashboard');
+  }
 }
 
 // Storage size helper
