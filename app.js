@@ -2085,7 +2085,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   await seedAdmin();
   // Remove legacy unscoped OAuth key (security: was storing all tokens in one global key)
   localStorage.removeItem('ssm_oauth');
-  refreshAdminNav();
 
   // Auto-login if a session exists and user is still registered
   const sessionEmail = getSession();
@@ -2095,9 +2094,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadAccountState(sessionEmail);
     showPage('app');
     showSection('dashboard');
+    refreshAdminNav();
   } else {
     clearSession();
     showPage('login');
+    refreshAdminNav();
   }
 
   // ── Handle pending platform connect after OAuth redirect ──
