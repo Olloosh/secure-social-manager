@@ -19,7 +19,7 @@ function safeUrl(url) {
 }
 function sanitizeError(err) {
   // Strip anything that looks like a token (long hex/base64 strings)
-  const msg = String(err?.message || err || 'Xatolik yuz berdi');
+  const msg = String(err?.message || err || 'An error occurred');
   return msg.replace(/[A-Za-z0-9+/=]{40,}/g, '[***]').slice(0, 200);
 }
 
@@ -111,7 +111,7 @@ function runCountersIn(section) {
 function showSection(sectionName) {
   // Admin section guard — only admin@ssm.uz can access
   if (sectionName === 'admin' && !isAdmin(getSession())) {
-    showToast('Ruxsat yo\'q', 'error');
+    showToast('Access denied', 'error');
     sectionName = 'dashboard';
   }
 
@@ -134,11 +134,11 @@ function showSection(sectionName) {
 
   // Update page title
   const titles = {
-    dashboard:    'Boshqaruv paneli',
-    'create-post':'Post yaratish',
-    analytics:    'Statistika',
-    settings:     'Sozlamalar',
-    admin:        'Admin paneli'
+    dashboard:    'Dashboard',
+    'create-post':'Create Post',
+    analytics:    'Analytics',
+    settings:     'Settings',
+    admin:        'Admin Panel'
   };
 
   pageTitle.textContent = titles[sectionName] || 'Dashboard';
@@ -183,17 +183,17 @@ document.getElementById('register-password')?.addEventListener('input', (e) => {
 
   const config = [
     null,
-    { color: 'var(--color-danger)',  text: 'Zaif' },
-    { color: 'var(--color-warning)', text: "O'rtacha" },
-    { color: '#3B82F6',              text: 'Yaxshi' },
-    { color: 'var(--color-success)', text: 'Kuchli' },
+    { color: 'var(--color-danger)',  text: 'Weak' },
+    { color: 'var(--color-warning)', text: 'Fair' },
+    { color: '#3B82F6',              text: 'Good' },
+    { color: 'var(--color-success)', text: 'Strong' },
   ];
 
   bars.forEach((bar, i) => {
     bar.style.background = i < score ? config[score].color : 'var(--color-gray-200)';
   });
 
-  label.textContent = score ? `Parol kuchi: ${config[score].text}` : '';
+  label.textContent = score ? `Password strength: ${config[score].text}` : '';
   label.style.color = score ? config[score].color : 'var(--color-gray-500)';
 });
 
@@ -230,7 +230,7 @@ document.getElementById('terms-agree-checkbox')?.addEventListener('change', (e) 
 
 document.getElementById('clear-all-data')?.addEventListener('click', (e) => {
   e.preventDefault();
-  if (!confirm('Barcha akkauntlar va ma\'lumotlar o\'chiriladi. Davom etasizmi?')) return;
+  if (!confirm('All accounts and data will be deleted. Continue?')) return;
   localStorage.clear();
   sessionStorage.clear();
   location.reload();
@@ -268,17 +268,17 @@ document.getElementById('forgot-email-form')?.addEventListener('submit', (e) => 
   const email = document.getElementById('forgot-email').value.trim().toLowerCase();
   const users = loadUsers();
   if (!users[email]) {
-    showToast('Bu email bilan akkaunt topilmadi', 'error');
+    showToast('No account found with this email', 'error');
     return;
   }
   const user = users[email];
   if (!user.passphraseHash) {
-    showToast('Bu akkauntda kalit so\'z o\'rnatilmagan — admin bilan bog\'laning', 'warning');
+    showToast('No security phrase set for this account — contact admin', 'warning');
     return;
   }
   forgotEmail = email;
-  const hint = user.passphraseHint || '(eslatma yo\'q)';
-  document.getElementById('forgot-hint-show').textContent = `💡 Eslatma: "${hint}"`;
+  const hint = user.passphraseHint || '(no hint)';
+  document.getElementById('forgot-hint-show').textContent = `💡 Hint: "${hint}"`;
   document.getElementById('forgot-step-email').classList.add('hidden');
   document.getElementById('forgot-step-hint').classList.remove('hidden');
   document.getElementById('forgot-hint-input').focus();
@@ -293,7 +293,7 @@ document.getElementById('forgot-hint-form')?.addEventListener('submit', async (e
   const user  = users[forgotEmail];
   const hash  = await sha256(val);
   if (hash !== user.passphraseHash) {
-    showToast('Kalit so\'z noto\'g\'ri', 'error');
+    showToast('Incorrect security phrase', 'error');
     document.getElementById('forgot-hint-input').value = '';
     document.getElementById('forgot-hint-input').focus();
     return;
@@ -310,16 +310,16 @@ document.getElementById('forgot-newpass-form')?.addEventListener('submit', async
   const p1 = document.getElementById('forgot-newpass').value;
   const p2 = document.getElementById('forgot-newpass2').value;
   if (p1.length < 8) {
-    showToast('Parol kamida 8 ta belgi bo\'lishi kerak', 'error'); return;
+    showToast('Password must be at least 8 characters', 'error'); return;
   }
   if (p1 !== p2) {
-    showToast('Parollar mos kelmaydi', 'error'); return;
+    showToast('Passwords do not match', 'error'); return;
   }
   const users = loadUsers();
   users[forgotEmail].passwordHash = await sha256(p1);
   saveUsers(users);
   forgotEmail = null;
-  showToast('Parol muvaffaqiyatli yangilandi! Endi kiring.', 'success');
+  showToast('Password updated successfully! Please sign in.', 'success');
   showPage('login');
 });
 
@@ -425,7 +425,7 @@ document.getElementById('login-form')?.addEventListener('submit', async (e) => {
   if (!email || !password) return;
 
   if (!isValidEmail(email)) {
-    setFieldError('login-email', 'Email noto\'g\'ri formatda (masalan: ism@gmail.com)');
+    setFieldError('login-email', 'Invalid email format (e.g. name@gmail.com)');
     shakeForm('login-form');
     return;
   }
@@ -434,17 +434,17 @@ document.getElementById('login-form')?.addEventListener('submit', async (e) => {
   const user  = users[email];
 
   if (!user) {
-    setFieldError('login-email', 'Bu email bilan ro\'yxatdan o\'tilmagan');
+    setFieldError('login-email', 'No account registered with this email');
     shakeForm('login-form');
-    showToast('Avval ro\'yxatdan o\'ting', 'error');
+    showToast('Please register first', 'error');
     return;
   }
 
   const hash = await sha256(password);
   if (hash !== user.passwordHash) {
-    setFieldError('login-password', 'Parol noto\'g\'ri');
+    setFieldError('login-password', 'Incorrect password');
     shakeForm('login-form');
-    showToast('Email yoki parol noto\'g\'ri', 'error');
+    showToast('Email or password is incorrect', 'error');
     return;
   }
 
@@ -465,7 +465,7 @@ document.getElementById('login-form')?.addEventListener('submit', async (e) => {
   addAndSwitchAccount(user.name, email);
   showPage('app');
   showSection('dashboard');
-  showToast(`Xush kelibsiz, ${user.name.split(' ')[0]}!`, 'success');
+  showToast(`Welcome, ${user.name.split(' ')[0]}!`, 'success');
 });
 
 // ========================================
@@ -481,22 +481,22 @@ document.getElementById('register-form')?.addEventListener('submit', async (e) =
   if (!email || !password) return;
 
   if (!isValidEmail(email)) {
-    setFieldError('register-email', 'Email noto\'g\'ri formatda (masalan: ism@gmail.com)');
+    setFieldError('register-email', 'Invalid email format (e.g. name@gmail.com)');
     shakeForm('register-form');
     return;
   }
 
   if (password.length < 6) {
-    setFieldError('register-password', 'Parol kamida 6 ta belgi bo\'lishi kerak');
+    setFieldError('register-password', 'Password must be at least 6 characters');
     shakeForm('register-form');
     return;
   }
 
   const users = loadUsers();
   if (users[email]) {
-    setFieldError('register-email', 'Bu email allaqachon ro\'yxatdan o\'tgan');
+    setFieldError('register-email', 'This email is already registered');
     shakeForm('register-form');
-    showToast('Email band — kirish tugmasini bosing', 'error');
+    showToast('Email taken — click sign in', 'error');
     return;
   }
 
@@ -515,7 +515,7 @@ document.getElementById('register-form')?.addEventListener('submit', async (e) =
   document.getElementById('twofa-pass').value = '';
   document.getElementById('twofa-hint').value = '';
   showPage('2fa-setup');
-  showToast('Akkaunt yaratildi — endi 2FA sozlang', 'success');
+  showToast('Account created — now set up 2FA', 'success');
 });
 
 // ========================================
@@ -529,12 +529,12 @@ document.getElementById('twofa-setup-form')?.addEventListener('submit', async (e
   const hint       = document.getElementById('twofa-hint').value.trim();
 
   if (passphrase.length < 4) {
-    setFieldError('twofa-pass', 'Kamida 4 ta belgi');
+    setFieldError('twofa-pass', 'At least 4 characters');
     shakeForm('twofa-setup-form');
     return;
   }
   if (!hint) {
-    setFieldError('twofa-hint', 'Kalit so\'z kerak');
+    setFieldError('twofa-hint', 'Security phrase required');
     shakeForm('twofa-setup-form');
     return;
   }
@@ -560,7 +560,7 @@ document.getElementById('twofa-setup-form')?.addEventListener('submit', async (e
   pending2FAEmail = null;
   showPage('app');
   showSection('dashboard');
-  showToast('2FA yoqildi — akkaunt himoyalangan 🛡️', 'success');
+  showToast('2FA enabled — account protected 🛡️', 'success');
 });
 
 // ========================================
@@ -586,9 +586,9 @@ document.getElementById('twofa-verify-form')?.addEventListener('submit', async (
 
   const hash = await sha256(passphrase);
   if (hash !== user.passphraseHash) {
-    setFieldError('twofa-verify-pass', 'Parol noto\'g\'ri — login sahifasiga qaytasiz');
+    setFieldError('twofa-verify-pass', 'Incorrect password — returning to login');
     shakeForm('twofa-verify-form');
-    showToast('Qo\'shimcha parol noto\'g\'ri', 'error');
+    showToast('Incorrect secondary password', 'error');
     // Kick back to login after short delay
     setTimeout(() => {
       pending2FAEmail = null;
@@ -605,7 +605,7 @@ document.getElementById('twofa-verify-form')?.addEventListener('submit', async (
   pending2FAEmail = null;
   showPage('app');
   showSection('dashboard');
-  showToast(`Xush kelibsiz, ${name.split(' ')[0]}!`, 'success');
+  showToast(`Welcome, ${name.split(' ')[0]}!`, 'success');
 });
 
 // Show hint
@@ -614,7 +614,7 @@ document.getElementById('twofa-show-hint')?.addEventListener('click', () => {
   const users = loadUsers();
   const user  = users[pending2FAEmail];
   if (!user) return;
-  document.getElementById('twofa-hint-value').textContent = user.passphraseHint || '(kalit so\'z yo\'q)';
+  document.getElementById('twofa-hint-value').textContent = user.passphraseHint || '(no security phrase)';
   document.getElementById('twofa-hint-box').classList.remove('hidden');
   document.getElementById('twofa-show-hint').style.display = 'none';
 });
@@ -638,7 +638,7 @@ function addAndSwitchAccount(name, email) {
   } else {
     const color = colors[savedAccounts.length % colors.length];
     savedAccounts.forEach(a => a.active = false);
-    savedAccounts.push({ id: Date.now(), name, email, initials, color, role: 'Pro foydalanuvchi', active: true });
+    savedAccounts.push({ id: Date.now(), name, email, initials, color, role: 'Pro user', active: true });
   }
 
   const active = savedAccounts.find(a => a.active);
@@ -674,7 +674,7 @@ function addAndSwitchAccount(name, email) {
 
   const firstName = active.name.split(' ')[0];
   const welcomeEl = document.querySelector('#section-dashboard .welcome-section h1');
-  if (welcomeEl) welcomeEl.textContent = `Xush kelibsiz, ${firstName}! 👋`;
+  if (welcomeEl) welcomeEl.textContent = `Welcome, ${firstName}! 👋`;
 }
 
 // ========================================
@@ -794,7 +794,7 @@ document.getElementById('post-media')?.addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) { resetMediaPreview(); return; }
   if (file.size > MAX_MEDIA_BYTES) {
-    showToast('Fayl 5 MB dan katta — kichikroqini tanlang', 'error');
+    showToast('File exceeds 5 MB — please choose a smaller one', 'error');
     resetMediaPreview();
     return;
   }
@@ -808,7 +808,7 @@ document.getElementById('post-media')?.addEventListener('change', async (e) => {
     (type === 'video'
       ? `<video src="${dataUrl}" controls></video>`
       : `<img src="${dataUrl}" alt="preview">`) +
-    `<button type="button" class="media-remove">✕ Olib tashlash</button>`;
+    `<button type="button" class="media-remove">✕ Remove</button>`;
   box.querySelector('.media-remove').addEventListener('click', resetMediaPreview);
 });
 
@@ -833,17 +833,17 @@ function renderPosts() {
   if (!list) return;
   const posts = email ? loadPosts(email) : [];
   if (!posts.length) {
-    list.innerHTML = '<p class="text-muted" id="posts-empty">Hali post yoʻq — birinchi postingizni yarating 👆</p>';
+    list.innerHTML = '<p class="text-muted" id="posts-empty">No posts yet — create your first one 👆</p>';
     return;
   }
   list.innerHTML = posts.map(p => {
     const iconBg = p.platform === 'telegram' ? '#29B6F6' : p.platform === 'instagram' ? 'linear-gradient(135deg,#f09433,#dc2743)' : p.platform === 'facebook' ? '#1877F2' : '#888';
     const icon = `<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:5px;background:${iconBg};flex-shrink:0;"><img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/${p.platform}.svg" alt="${p.platform}" style="width:14px;height:14px;filter:brightness(0) invert(1);"></span>`;
     const statusBadge = p.status === 'published'
-      ? '<span class="badge badge-success">✓ Yuklandi</span>'
+      ? '<span class="badge badge-success">✓ Published</span>'
       : p.status === 'failed'
-        ? '<span class="badge badge-danger">✕ Xatolik</span>'
-        : '<span class="badge badge-primary">📅 Rejalashtirilgan</span>';
+        ? '<span class="badge badge-danger">✕ Failed</span>'
+        : '<span class="badge badge-primary">📅 Scheduled</span>';
     const media = !p.media ? '' :
       p.media.type === 'video'
         ? `<div class="post-media"><video src="${p.media.dataUrl}" controls></video></div>`
@@ -860,7 +860,7 @@ function renderPosts() {
             <span>•</span>
             <span>${when}</span>
             ${statusBadge}
-            <button class="post-delete" data-id="${p.id}">🗑 O'chirish</button>
+            <button class="post-delete" data-id="${p.id}">🗑 Delete</button>
           </div>
           <p class="post-text">${escapeHtml(p.content)}</p>
           ${p.error ? `<p class="text-muted" style="color:var(--color-danger);font-size:0.8rem;margin:0;">${escapeHtml(p.error)}</p>` : ''}
@@ -877,7 +877,7 @@ document.getElementById('posts-list')?.addEventListener('click', (e) => {
   const posts = loadPosts(email).filter(p => p.id !== btn.dataset.id);
   savePosts(email, posts);
   renderPosts();
-  showToast('Post o\'chirildi', 'info');
+  showToast('Post deleted', 'info');
 });
 
 // ────────────────────────────────────────────────────────────
@@ -893,8 +893,8 @@ function getTgConfig() {
 
 async function tryPublishTelegram(content, imgUrl) {
   const cfg = getTgConfig();
-  if (!cfg.botToken) throw new Error('Telegram bot token kiritilmagan — Sozlamalar → Platformalar da saqlang');
-  if (!cfg.channel)  throw new Error('Telegram kanal nomi kiritilmagan — @kanal_nomi yoki chat ID');
+  if (!cfg.botToken) throw new Error('Telegram bot token not set — save it in Settings → Platforms');
+  if (!cfg.channel)  throw new Error('Telegram channel not set — enter @channel_name or chat ID');
 
   const base = `https://api.telegram.org/bot${cfg.botToken}`;
 
@@ -905,7 +905,7 @@ async function tryPublishTelegram(content, imgUrl) {
       body: JSON.stringify({ chat_id: cfg.channel, photo: imgUrl, caption: content }),
     });
     const j = await r.json();
-    if (!j.ok) throw new Error(j.description || 'Telegram xatolik');
+    if (!j.ok) throw new Error(j.description || 'Telegram error');
     return j;
   } else {
     const r = await fetch(`${base}/sendMessage`, {
@@ -914,7 +914,7 @@ async function tryPublishTelegram(content, imgUrl) {
       body: JSON.stringify({ chat_id: cfg.channel, text: content }),
     });
     const j = await r.json();
-    if (!j.ok) throw new Error(j.description || 'Telegram xatolik');
+    if (!j.ok) throw new Error(j.description || 'Telegram error');
     return j;
   }
 }
@@ -922,15 +922,15 @@ async function tryPublishTelegram(content, imgUrl) {
 // ─── Instagram Graph API posting ─────────────────────────
 async function tryPublishInstagram(content, imgUrl) {
   const tok = getOAuth('instagram');
-  if (!tok || !tok.access_token) throw new Error('Instagram ulangan emas');
+  if (!tok || !tok.access_token) throw new Error('Instagram is not connected');
 
   // Step 1: get IG business account via FB API
   const fbSdk = await loadFacebookSDK();
   const igUser = await new Promise((res, rej) => {
     FB.api('/me/accounts', { fields: 'instagram_business_account,name', access_token: tok.access_token }, (r) => {
-      if (!r || r.error) return rej(new Error(r?.error?.message || 'Facebook sahifalar topilmadi'));
+      if (!r || r.error) return rej(new Error(r?.error?.message || 'Facebook pages not found'));
       const page = (r.data || []).find(p => p.instagram_business_account);
-      if (!page) return rej(new Error('Instagram Business akkaunt topilmadi — Facebook Sahifaga bog\'liq IG kerak'));
+      if (!page) return rej(new Error('Instagram Business account not found — an IG account linked to a Facebook Page is required'));
       res(page.instagram_business_account.id);
     });
   });
@@ -942,7 +942,7 @@ async function tryPublishInstagram(content, imgUrl) {
 
   const container = await new Promise((res, rej) => {
     FB.api(`/${igUser}/media`, 'POST', mediaParams, (r) => {
-      if (!r || r.error) return rej(new Error(r?.error?.message || 'IG media yaratishda xatolik'));
+      if (!r || r.error) return rej(new Error(r?.error?.message || 'Error creating IG media container'));
       res(r.id);
     });
   });
@@ -952,7 +952,7 @@ async function tryPublishInstagram(content, imgUrl) {
     FB.api(`/${igUser}/media_publish`, 'POST',
       { creation_id: container, access_token: tok.access_token },
       (r) => {
-        if (!r || r.error) return rej(new Error(r?.error?.message || 'IG publish xatolik'));
+        if (!r || r.error) return rej(new Error(r?.error?.message || 'IG publish error'));
         res(r);
       });
   });
@@ -963,14 +963,14 @@ async function publishNow(platform, content, imgUrl) {
   if (platform === 'facebook')  return tryPublishFacebook(content, imgUrl);
   if (platform === 'telegram')  return tryPublishTelegram(content, imgUrl);
   if (platform === 'instagram') return tryPublishInstagram(content, imgUrl);
-  throw new Error(`${platform} uchun hozircha to'g'ridan-to'g'ri yuborish qo'llab-quvvatlanmaydi`);
+  throw new Error(`Direct publishing for ${platform} is not supported yet`);
 }
 
 // ─── Facebook Graph API posting ──────────────────────────
 async function tryPublishFacebook(content, imgUrl) {
   const tok = getOAuth('facebook');
   if (!tok || !tok.access_token) {
-    throw new Error('Facebook ulangan emas — Sozlamalar → Platformalar da ulang');
+    throw new Error('Facebook is not connected — connect it in Settings → Platforms');
   }
   if (!window.FB) await loadFacebookSDK();
 
@@ -982,7 +982,7 @@ async function tryPublishFacebook(content, imgUrl) {
     const params = { message: content, access_token: pageToken };
     if (imgUrl && imgUrl.startsWith('http')) params.link = imgUrl;
     FB.api(`/${pageId}/feed`, 'POST', params, (res) => {
-      if (!res || res.error) reject(new Error(res?.error?.message || 'Facebook xatolik'));
+      if (!res || res.error) reject(new Error(res?.error?.message || 'Facebook error'));
       else resolve(res);
     });
   });
@@ -993,23 +993,23 @@ document.getElementById('create-post-form')?.addEventListener('submit', async (e
   e.preventDefault();
 
   const email = getSession();
-  if (!email) { showToast('Avval login qiling', 'error'); return; }
+  if (!email) { showToast('Please sign in first', 'error'); return; }
 
   const platform = document.querySelector('input[name="platform"]:checked')?.value || 'telegram';
   const content  = document.getElementById('post-content').value.trim();
   const date     = document.getElementById('post-date').value;
   const time     = document.getElementById('post-time').value;
-  if (!content) { showToast('Matn bo\'sh bo\'lmasligi kerak', 'error'); return; }
+  if (!content) { showToast('Content cannot be empty', 'error'); return; }
 
   // Must have at least one platform connected
   if (connectedSet.size === 0) {
-    showToast('Avval account qo\'shing — Sozlamalar → Platformalar', 'error');
+    showToast('Connect an account first — Settings → Platforms', 'error');
     showSection('settings');
     document.querySelector('.settings-nav-item[data-settings="platforms"]')?.click();
     return;
   }
   if (!connectedSet.has(platform)) {
-    showToast(`${platform.charAt(0).toUpperCase() + platform.slice(1)} ulanmagan — avval uni ulang`, 'error');
+    showToast(`${platform.charAt(0).toUpperCase() + platform.slice(1)} is not connected — connect it first`, 'error');
     showSection('settings');
     document.querySelector('.settings-nav-item[data-settings="platforms"]')?.click();
     return;
@@ -1040,7 +1040,7 @@ document.getElementById('create-post-form')?.addEventListener('submit', async (e
       showToast(`Xatolik: ${sanitizeError(err)}`, 'error');
     }
   } else {
-    showToast(`Post ${new Date(scheduledAt || Date.now()).toLocaleString()} ga rejalashtirildi 📅`, 'success');
+    showToast(`Post scheduled for ${new Date(scheduledAt || Date.now()).toLocaleString()} 📅`, 'success');
   }
 
   // Save locally
@@ -1084,26 +1084,26 @@ document.getElementById('create-post-form')?.addEventListener('submit', async (e
 // "Hoziroq yuklash" button — publish immediately without scheduling
 document.getElementById('publish-now-btn')?.addEventListener('click', async () => {
   const email = getSession();
-  if (!email) { showToast('Avval login qiling', 'error'); return; }
+  if (!email) { showToast('Please sign in first', 'error'); return; }
 
   const platform = document.querySelector('input[name="platform"]:checked')?.value || 'telegram';
   const content  = document.getElementById('post-content').value.trim();
-  if (!content) { showToast('Matn bo\'sh bo\'lmasligi kerak', 'error'); return; }
+  if (!content) { showToast('Content cannot be empty', 'error'); return; }
 
   if (connectedSet.size === 0) {
-    showToast('Avval account qo\'shing — Sozlamalar → Platformalar', 'error');
+    showToast('Connect an account first — Settings → Platforms', 'error');
     showSection('settings');
     document.querySelector('.settings-nav-item[data-settings="platforms"]')?.click();
     return;
   }
   if (!connectedSet.has(platform)) {
-    showToast(`${platform.charAt(0).toUpperCase()+platform.slice(1)} ulanmagan`, 'error');
+    showToast(`${platform.charAt(0).toUpperCase()+platform.slice(1)} is not connected`, 'error');
     return;
   }
 
   const btn = document.getElementById('publish-now-btn');
   btn.disabled = true;
-  btn.innerHTML = '<span>⏳</span> Yuborilmoqda...';
+  btn.innerHTML = '<span>⏳</span> Publishing...';
 
   const imgUrl = pendingMedia?.type === 'image' ? pendingMedia.dataUrl : null;
   const post = {
@@ -1126,7 +1126,7 @@ document.getElementById('publish-now-btn')?.addEventListener('click', async () =
   }
 
   btn.disabled = false;
-  btn.innerHTML = '<span>⚡</span> Hoziroq yuklash';
+  btn.innerHTML = '<span>⚡</span> Publish now';
 
   const posts = loadPosts(email);
   posts.unshift(post);
@@ -1136,7 +1136,7 @@ document.getElementById('publish-now-btn')?.addEventListener('click', async () =
 
 // Save draft button
 document.getElementById('save-draft-btn')?.addEventListener('click', () => {
-  showToast('Qoralama saqlandi ✓', 'success');
+  showToast('Draft saved ✓', 'success');
 });
 
 // ========================================
@@ -1220,12 +1220,12 @@ document.getElementById('avatar-input')?.addEventListener('change', (e) => {
   const file = e.target.files && e.target.files[0];
   if (!file) return;
   if (!file.type.startsWith('image/')) {
-    showToast('Faqat rasm fayllari ruxsat etiladi', 'error');
+    showToast('Only image files are allowed', 'error');
     e.target.value = '';
     return;
   }
   if (file.size > 2 * 1024 * 1024) {
-    showToast('Rasm juda katta — maks. 2 MB', 'error');
+    showToast('Image too large — max. 2 MB', 'error');
     e.target.value = '';
     return;
   }
@@ -1240,7 +1240,7 @@ document.getElementById('avatar-input')?.addEventListener('change', (e) => {
     saveUsers(users);
     addAndSwitchAccount(user.name, email);
     populateAccountForm();
-    showToast('Profil rasmi yangilandi ✓', 'success');
+    showToast('Profile picture updated ✓', 'success');
   };
   reader.readAsDataURL(file);
   e.target.value = '';
@@ -1257,7 +1257,7 @@ document.getElementById('avatar-remove-btn')?.addEventListener('click', () => {
   saveUsers(users);
   addAndSwitchAccount(user.name, email);
   populateAccountForm();
-  showToast('Profil rasmi o\'chirildi', 'info');
+  showToast('Profile picture removed', 'info');
 });
 
 // 2FA Toggle
@@ -1269,23 +1269,23 @@ twoFactorToggle?.addEventListener('change', (e) => {
 
 // Change Password button
 document.getElementById('change-password-btn')?.addEventListener('click', () => {
-  showToast('Parolni tiklash havolasi emailingizga yuborildi', 'info');
+  showToast('Password reset link sent to your email', 'info');
 });
 
 // Save Account button — persist to localStorage user record
 document.getElementById('save-account-btn')?.addEventListener('click', () => {
   const email = getSession();
-  if (!email) { showToast('Avval login qiling', 'error'); return; }
+  if (!email) { showToast('Please sign in first', 'error'); return; }
   const users = loadUsers();
   const user  = users[email];
-  if (!user)  { showToast('Foydalanuvchi topilmadi', 'error'); return; }
+  if (!user)  { showToast('User not found', 'error'); return; }
 
   const name     = document.getElementById('account-name').value.trim();
   const username = document.getElementById('account-username').value.trim();
   const birthday = document.getElementById('account-birthday').value;
   const gender   = document.getElementById('account-gender').value;
 
-  if (!name) { showToast('Ism bo\'sh bo\'lmasligi kerak', 'error'); return; }
+  if (!name) { showToast('Name cannot be empty', 'error'); return; }
 
   user.name     = name;
   user.username = username;
@@ -1295,27 +1295,27 @@ document.getElementById('save-account-btn')?.addEventListener('click', () => {
 
   // Refresh topbar + avatar
   addAndSwitchAccount(user.name, email);
-  showToast('Ma\'lumotlar saqlandi ✓', 'success');
+  showToast('Changes saved ✓', 'success');
 });
 
 // ========================================
 // Platform Connect — gramir.uz style
 // ========================================
 const allPlatforms = [
-  { id: 'telegram',  name: 'Telegram',  icon: '<img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/telegram.svg" alt="Telegram" style="width:60%;height:60%;filter:brightness(0) invert(1);">', iconBg: '#29B6F6', tagline: 'Kanal va guruhlaringizni ulang', btnColor: '#29B6F6', btnText: 'Telegram hisobini ulash'  },
-  { id: 'instagram', name: 'Instagram', icon: '<img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/instagram.svg" alt="Instagram" style="width:60%;height:60%;filter:brightness(0) invert(1);">', iconBg: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', tagline: 'Instagram biznes hisobingizni ulang', btnColor: 'linear-gradient(135deg,#e6683c,#cc2366)', btnText: 'Instagram hisobini ulash' },
-  { id: 'facebook',  name: 'Facebook',  icon: '<img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/facebook.svg" alt="Facebook" style="width:60%;height:60%;filter:brightness(0) invert(1);">', iconBg: '#1877F2', tagline: 'Facebook sahifangizni ulang', btnColor: '#1877F2', btnText: 'Facebook hisobini ulash'  },
-  { id: 'linkedin',  name: 'LinkedIn',  icon: 'in', iconBg: '#0A66C2',                                                              tagline: 'LinkedIn kompaniya sahifangizni ulang',    btnColor: '#0A66C2',                                         btnText: 'LinkedIn hisobini ulash'  },
-  { id: 'youtube',   name: 'YouTube',   icon: '▶',  iconBg: '#FF0000',                                                              tagline: 'YouTube kanalingizni ulang',               btnColor: '#FF0000',                                         btnText: 'YouTube hisobini ulash'   },
-  { id: 'twitter',   name: 'X',         icon: '✕',  iconBg: '#111',                                                                  tagline: 'X (Twitter) hisobingizni ulang',           btnColor: '#111',                                            btnText: 'X hisobini ulash'         },
-  { id: 'threads',   name: 'Threads',   icon: '@',  iconBg: '#111',                                                                  tagline: 'Threads hisobingizni ulang',               btnColor: '#111',                                            btnText: 'Threads hisobini ulash'   },
+  { id: 'telegram',  name: 'Telegram',  icon: '<img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/telegram.svg" alt="Telegram" style="width:60%;height:60%;filter:brightness(0) invert(1);">', iconBg: '#29B6F6', tagline: 'Connect your channels and groups', btnColor: '#29B6F6', btnText: 'Connect Telegram account'  },
+  { id: 'instagram', name: 'Instagram', icon: '<img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/instagram.svg" alt="Instagram" style="width:60%;height:60%;filter:brightness(0) invert(1);">', iconBg: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', tagline: 'Connect your Instagram business account', btnColor: 'linear-gradient(135deg,#e6683c,#cc2366)', btnText: 'Connect Instagram account' },
+  { id: 'facebook',  name: 'Facebook',  icon: '<img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/facebook.svg" alt="Facebook" style="width:60%;height:60%;filter:brightness(0) invert(1);">', iconBg: '#1877F2', tagline: 'Connect your Facebook page', btnColor: '#1877F2', btnText: 'Connect Facebook account'  },
+  { id: 'linkedin',  name: 'LinkedIn',  icon: 'in', iconBg: '#0A66C2',                                                              tagline: 'Connect your LinkedIn company page',    btnColor: '#0A66C2',                                         btnText: 'Connect LinkedIn account'  },
+  { id: 'youtube',   name: 'YouTube',   icon: '▶',  iconBg: '#FF0000',                                                              tagline: 'Connect your YouTube channel',          btnColor: '#FF0000',                                         btnText: 'Connect YouTube account'   },
+  { id: 'twitter',   name: 'X',         icon: '✕',  iconBg: '#111',                                                                  tagline: 'Connect your X (Twitter) account',     btnColor: '#111',                                            btnText: 'Connect X account'         },
+  { id: 'threads',   name: 'Threads',   icon: '@',  iconBg: '#111',                                                                  tagline: 'Connect your Threads account',          btnColor: '#111',                                            btnText: 'Connect Threads account'   },
 ];
 
 const oauthSteps = [
-  'Tanlangan platforma sahifasiga yo\'naltirilasiz',
-  'Hisobingizga kiring (agar kirilmagan bo\'lsa)',
-  'Secure Social ilovasiga ruxsat bering',
-  'Avtomatik qaytarilasiz',
+  'You will be redirected to the selected platform',
+  'Sign in to your account (if not already)',
+  'Grant permission to the Secure Social app',
+  'You will be redirected back automatically',
 ];
 
 const connectedSet = new Set();
@@ -1474,11 +1474,11 @@ function resetAllPlatformUI() {
   allPlatforms.forEach(p => {
     const row = document.getElementById(`platform-${p.id}`);
     if (!row) return;
-    row.querySelector('.platform-status-text').textContent = 'Ulanmagan';
+    row.querySelector('.platform-status-text').textContent = 'Not connected';
     row.style.opacity = '0.65';
     row.querySelector('.platform-badge')?.remove();
     const btn = row.querySelector('.platform-action-btn');
-    if (btn) btn.outerHTML = `<button class="btn btn-primary platform-action-btn" style="margin-left:auto;" data-action="connect" data-platform="${p.id}">Ulash</button>`;
+    if (btn) btn.outerHTML = `<button class="btn btn-primary platform-action-btn" style="margin-left:auto;" data-action="connect" data-platform="${p.id}">Connect</button>`;
   });
   document.getElementById('telegram-config')?.classList.add('hidden');
 }
@@ -1488,14 +1488,14 @@ function restorePlatformUI(id) {
   connectedSet.add(id);
   const row = document.getElementById(`platform-${id}`);
   if (!row) return;
-  row.querySelector('.platform-status-text').textContent = 'Ulangan';
+  row.querySelector('.platform-status-text').textContent = 'Connected';
   row.style.opacity = '1';
   row.querySelector('.platform-badge')?.remove();
   const btn = row.querySelector('.platform-action-btn');
   if (btn) btn.outerHTML = `
-    <span class="badge badge-success platform-badge">✓ Ulangan</span>
+    <span class="badge badge-success platform-badge">✓ Connected</span>
     <button class="btn btn-outline platform-action-btn" style="margin-left:auto;"
-      data-action="disconnect" data-platform="${id}">Uzish</button>`;
+      data-action="disconnect" data-platform="${id}">Disconnect</button>`;
   if (id === 'telegram') {
     const cfg = document.getElementById('telegram-config');
     if (cfg) {
@@ -1513,7 +1513,7 @@ function loadAccountState(email) {
   loadConnectedPlatforms(email).forEach(id => restorePlatformUI(id));
   // Fix counter
   document.querySelectorAll('.stat-card .stat-content').forEach(card => {
-    if (card.querySelector('p')?.textContent === 'Ulangan platformalar') {
+    if (card.querySelector('p')?.textContent === 'Connected platforms') {
       card.querySelector('h3').textContent = connectedSet.size;
     }
   });
@@ -1561,7 +1561,7 @@ function mountTelegramWidget() {
   // Show error if config not injected yet
   if (!botId || botId.startsWith('__')) {
     slot.innerHTML = `<p style="color:#ef4444;font-size:0.85rem;margin-top:0.75rem;padding:0.75rem;background:#fef2f2;border-radius:8px;">
-      ⚠️ Telegram Bot ID sozlanmagan — Netlify dashboard da <b>TG_BOT_ID</b> env var qo'shing va qayta deploy qiling.
+      ⚠️ Telegram Bot ID not configured — add the <b>TG_BOT_ID</b> env var in your Netlify dashboard and redeploy.
     </p>`;
     return;
   }
@@ -1577,7 +1577,7 @@ function mountTelegramWidget() {
       background:#29B6F6;color:#fff;border:none;border-radius:10px;
       font-size:1rem;font-weight:600;cursor:pointer;">
       <img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/telegram.svg" style="width:20px;height:20px;filter:brightness(0) invert(1);">
-      Telegram hisobini ulash
+      Connect Telegram account
     </button>`;
 
   document.getElementById('tg-popup-btn').addEventListener('click', () => {
@@ -1613,10 +1613,10 @@ async function loginWithInstagram() {
   const FB = await loadFacebookSDK();
   return new Promise((resolve, reject) => {
     FB.login((resp) => {
-      if (resp.status !== 'connected') return reject(new Error('Instagram login bekor qilindi'));
+      if (resp.status !== 'connected') return reject(new Error('Instagram login cancelled'));
       const token = resp.authResponse.accessToken;
       FB.api('/me', { fields: 'id,name,picture' }, (me) => {
-        if (!me || me.error) return reject(new Error(me?.error?.message || 'FB API xatosi'));
+        if (!me || me.error) return reject(new Error(me?.error?.message || 'FB API error'));
         resolve({
           access_token: token,
           user_id:      me.id,
@@ -1630,14 +1630,14 @@ async function loginWithInstagram() {
 
 // ── Success UI helper ────────────────────────────────────
 function showSuccessAndClose(platformName, displayName) {
-  document.getElementById('modal-success-title').textContent = `${platformName} ulandi! 🎉`;
-  document.getElementById('modal-success-sub').textContent   = displayName ? `@${displayName} ulandi` : 'Hisob muvaffaqiyatli ulandi';
+  document.getElementById('modal-success-title').textContent = `${platformName} connected! 🎉`;
+  document.getElementById('modal-success-sub').textContent   = displayName ? `@${displayName} connected` : 'Account connected successfully';
   showModalStep('success');
   setTimeout(() => { connectPlatform(currentPlatform); closeConnectModal(); }, 1400);
 }
 function showLoading(platformName) {
-  document.getElementById('modal-loading-title').textContent = `${platformName} ga ulanmoqda...`;
-  document.getElementById('modal-loading-sub').textContent   = 'Iltimos kuting';
+  document.getElementById('modal-loading-title').textContent = `Connecting to ${platformName}...`;
+  document.getElementById('modal-loading-sub').textContent   = 'Please wait';
   showModalStep('loading');
 }
 function showError(msg) {
@@ -1655,7 +1655,7 @@ document.getElementById('detail-connect-btn')?.addEventListener('click', async (
 
   // FACEBOOK
   if (p.id === 'facebook') {
-    if (!CFG.FACEBOOK_APP_ID) return showError('FACEBOOK_APP_ID oauth-config.js da to\'ldirilmagan');
+    if (!CFG.FACEBOOK_APP_ID) return showError('FACEBOOK_APP_ID not set in oauth-config.js');
     showLoading(p.name);
     try {
       const data = await loginWithFacebook();
@@ -1667,7 +1667,7 @@ document.getElementById('detail-connect-btn')?.addEventListener('click', async (
 
   // INSTAGRAM
   if (p.id === 'instagram') {
-    if (!CFG.FACEBOOK_APP_ID) return showError('FACEBOOK_APP_ID oauth-config.js da to\'ldirilmagan');
+    if (!CFG.FACEBOOK_APP_ID) return showError('FACEBOOK_APP_ID not set in oauth-config.js');
     showLoading(p.name);
     try {
       const data = await loginWithInstagram();
@@ -1688,14 +1688,14 @@ function connectPlatform(id) {
   const p   = allPlatforms.find(x => x.id === id);
   const row = document.getElementById(`platform-${id}`);
   if (row) {
-    row.querySelector('.platform-status-text').textContent = 'Ulangan';
+    row.querySelector('.platform-status-text').textContent = 'Connected';
     row.style.opacity = '1';
     row.querySelector('.platform-badge')?.remove();
     const btn = row.querySelector('.platform-action-btn');
     if (btn) btn.outerHTML = `
-      <span class="badge badge-success platform-badge">✓ Ulangan</span>
+      <span class="badge badge-success platform-badge">✓ Connected</span>
       <button class="btn btn-outline platform-action-btn" style="margin-left:auto;"
-        data-action="disconnect" data-platform="${id}">Uzish</button>`;
+        data-action="disconnect" data-platform="${id}">Disconnect</button>`;
   }
   if (id === 'telegram') {
     const cfg = document.getElementById('telegram-config');
@@ -1709,7 +1709,7 @@ function connectPlatform(id) {
   const emailNow = getSession();
   if (emailNow) saveConnectedPlatforms(emailNow);
   updatePlatformCounter(+1);
-  showToast(`${p?.name} muvaffaqiyatli ulandi!`, 'success');
+  showToast(`${p?.name} connected successfully!`, 'success');
 }
 
 // ── UI: disconnect ────────────────────────────────────────
@@ -1718,13 +1718,13 @@ function disconnectPlatform(id) {
   const p   = allPlatforms.find(x => x.id === id);
   const row = document.getElementById(`platform-${id}`);
   if (row) {
-    row.querySelector('.platform-status-text').textContent = 'Ulanmagan';
+    row.querySelector('.platform-status-text').textContent = 'Not connected';
     row.style.opacity = '0.65';
     row.querySelector('.platform-badge')?.remove();
     const btn = row.querySelector('.platform-action-btn');
     if (btn) btn.outerHTML = `
       <button class="btn btn-primary platform-action-btn" style="margin-left:auto;"
-        data-action="connect" data-platform="${id}">Ulash</button>`;
+        data-action="connect" data-platform="${id}">Connect</button>`;
   }
   if (id === 'telegram') {
     document.getElementById('telegram-config')?.classList.add('hidden');
@@ -1733,12 +1733,12 @@ function disconnectPlatform(id) {
   if (emailNow) saveConnectedPlatforms(emailNow);
   removeOAuth(id);
   updatePlatformCounter(-1);
-  showToast(`${p?.name} ulanishi uzildi`, 'warning');
+  showToast(`${p?.name} disconnected`, 'warning');
 }
 
 function updatePlatformCounter(delta) {
   document.querySelectorAll('.stat-card .stat-content').forEach(card => {
-    if (card.querySelector('p')?.textContent === 'Ulangan platformalar') {
+    if (card.querySelector('p')?.textContent === 'Connected platforms') {
       const h3 = card.querySelector('h3');
       h3.textContent = Math.max(0, parseInt(h3.textContent || 0) + delta);
     }
@@ -1750,10 +1750,10 @@ function updatePlatformCounter(delta) {
 document.getElementById('save-tg-config')?.addEventListener('click', () => {
   const token   = document.getElementById('tg-bot-token')?.value.trim();
   const channel = document.getElementById('tg-channel')?.value.trim();
-  if (!token)   { showToast('Bot token bo\'sh bo\'lmasligi kerak', 'error'); return; }
-  if (!channel) { showToast('Kanal nomi bo\'sh bo\'lmasligi kerak', 'error'); return; }
+  if (!token)   { showToast('Bot token cannot be empty', 'error'); return; }
+  if (!channel) { showToast('Channel name cannot be empty', 'error'); return; }
   saveTgConfig({ botToken: token, channel });
-  showToast('Telegram sozlamalari saqlandi ✓', 'success');
+  showToast('Telegram settings saved ✓', 'success');
 });
 
 // Mobile Sidebar Toggle
@@ -1828,7 +1828,7 @@ function switchAccount(id) {
   // Update welcome message
   const firstName = acc.name.split(' ')[0];
   const welcomeEl = document.querySelector('#section-dashboard .welcome-section h1');
-  if (welcomeEl) welcomeEl.textContent = `Xush kelibsiz, ${firstName}! 👋`;
+  if (welcomeEl) welcomeEl.textContent = `Welcome, ${firstName}! 👋`;
 
   // Restore this account's platform connections and posts
   loadAccountState(acc.email);
@@ -1842,7 +1842,7 @@ function switchAccount(id) {
   refreshAdminNav();
   renderAccountList();
   closeAccountDropdown();
-  showToast(`${acc.name} akkauntiga o'tildi`, 'success');
+  showToast(`Switched to ${acc.name}`, 'success');
 }
 
 function openAccountDropdown() {
@@ -1888,7 +1888,7 @@ async function seedAdmin() {
       name:           'Admin',
       passwordHash:   _AH,
       passphraseHash: _APH,
-      passphraseHint: 'tizim boshlig\'ining maxsus so\'zi',
+      passphraseHint: 'system administrator phrase',
       created_at:     Date.now(),
       role:           'admin',
     };
@@ -1957,7 +1957,7 @@ function renderAdminPanel() {
   // Users table — escape all user-supplied content
   const tbody = document.getElementById('admin-users-body');
   if (!emails.length) {
-    tbody.innerHTML = '<tr><td colspan="4" class="admin-empty">Hali foydalanuvchilar yo\'q</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4" class="admin-empty">No users yet</td></tr>';
   } else {
     tbody.innerHTML = emails.map(email => {
       const u = users[email];
@@ -1968,7 +1968,7 @@ function renderAdminPanel() {
           <td><span class="admin-email">${escapeHtml(email)}</span>${isAdm ? '<span class="admin-role-badge">ADMIN</span>' : ''}</td>
           <td>${escapeHtml(u.name)}</td>
           <td>${escapeHtml(date)}</td>
-          <td>${isAdm ? '<span style="color:#9ca3af;font-size:0.78rem;">— (himoyalangan)</span>' : `<button class="admin-action-btn" data-del-user="${escapeHtml(email)}">O'chirish</button>`}</td>
+          <td>${isAdm ? '<span style="color:#9ca3af;font-size:0.78rem;">— (protected)</span>' : `<button class="admin-action-btn" data-del-user="${escapeHtml(email)}">Delete</button>`}</td>
         </tr>`;
     }).join('');
   }
@@ -1992,7 +1992,7 @@ function renderAdminPanel() {
   });
   oauthWrap.innerHTML = chips.length
     ? chips.join('')
-    : '<p class="admin-empty">Hech qanday akkaunt ulanmagan</p>';
+    : '<p class="admin-empty">No accounts connected</p>';
 }
 
 // Delete user action
@@ -2000,33 +2000,33 @@ document.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-del-user]');
   if (!btn) return;
   const email = btn.dataset.delUser;
-  if (!confirm(`"${email}" foydalanuvchisini o'chirishni tasdiqlaysizmi?`)) return;
+  if (!confirm(`Delete user "${email}"?`)) return;
   const users = loadUsers();
   delete users[email];
   saveUsers(users);
   renderAdminPanel();
-  showToast(`${email} o'chirildi`, 'success');
+  showToast(`${email} deleted`, 'success');
 });
 
 // Danger zone handlers
 document.getElementById('admin-clear-users')?.addEventListener('click', () => {
-  if (!confirm('Barcha foydalanuvchilar o\'chiriladi (admin qoladi). Davom etasizmi?')) return;
+  if (!confirm('All users will be deleted (admin remains). Continue?')) return;
   const users = loadUsers();
   const adminUser = users[ADMIN_EMAIL];
   saveUsers(adminUser ? { [ADMIN_EMAIL]: adminUser } : {});
   renderAdminPanel();
-  showToast('Foydalanuvchilar bazasi tozalandi', 'success');
+  showToast('User database cleared', 'success');
 });
 document.getElementById('admin-clear-oauth')?.addEventListener('click', () => {
-  if (!confirm('Barcha OAuth ulanishlar o\'chiriladi. Davom etasizmi?')) return;
+  if (!confirm('All OAuth connections will be deleted. Continue?')) return;
   localStorage.removeItem(OAUTH_STORE_KEY);
   // Reset UI
   connectedSet.clear();
   renderAdminPanel();
-  showToast('OAuth ulanishlar tozalandi', 'success');
+  showToast('OAuth connections cleared', 'success');
 });
 document.getElementById('admin-clear-all')?.addEventListener('click', () => {
-  if (!confirm('LOCALSTORAGE TO\'LIQ TOZALANADI. Sahifa yangilanadi. Davom etasizmi?')) return;
+  if (!confirm('ALL LOCALSTORAGE WILL BE CLEARED. The page will reload. Continue?')) return;
   localStorage.clear();
   location.reload();
 });
@@ -2108,7 +2108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     connectPlatform(pendingConnect);
     showSection('settings');
     document.querySelector('.settings-nav-item[data-settings="platforms"]')?.click();
-    showToast(`${pendingConnect.charAt(0).toUpperCase() + pendingConnect.slice(1)} muvaffaqiyatli ulandi! ✓`, 'success');
+    showToast(`${pendingConnect.charAt(0).toUpperCase() + pendingConnect.slice(1)} connected successfully! ✓`, 'success');
   }
 
 

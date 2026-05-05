@@ -19,12 +19,12 @@
           <div class="logo-icon">🔐</div>
           <h1>Secure Social</h1>
         </div>
-        <h2 class="auth-title">Xush kelibsiz</h2>
-        <p class="auth-subtitle">Ijtimoiy tarmoqlarni xavfsiz boshqaring</p>
+        <h2 class="auth-title">Welcome back</h2>
+        <p class="auth-subtitle">Manage your social media securely</p>
 
         <form class="auth-form" id="login-form">
           <div class="form-group">
-            <label class="form-label" for="login-email">Email manzil</label>
+            <label class="form-label" for="login-email">Email address</label>
             <div class="input-group">
               <span class="input-icon">📧</span>
               <input type="email" id="login-email" class="form-input" placeholder="Email" required>
@@ -32,11 +32,11 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="login-password">Parol</label>
+            <label class="form-label" for="login-password">Password</label>
             <div class="input-group">
               <span class="input-icon">🔒</span>
-              <input type="password" id="login-password" class="form-input has-toggle" placeholder="Parolingizni kiriting" required>
-              <button type="button" class="password-toggle" data-target="login-password" aria-label="Parolni ko'rsatish">
+              <input type="password" id="login-password" class="form-input has-toggle" placeholder="Enter your password" required>
+              <button type="button" class="password-toggle" data-target="login-password" aria-label="Show password">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
@@ -46,20 +46,20 @@
             <label class="toggle-switch" style="font-size: 0.875rem;">
               <input type="checkbox" id="remember-me">
               <span class="toggle-slider"></span>
-              Meni eslab qol
+              Remember me
             </label>
-            <a href="#" id="go-to-forgot" style="font-size: 0.875rem;">Parolni unutdingizmi?</a>
+            <a href="#" id="go-to-forgot" style="font-size: 0.875rem;">Forgot your password?</a>
           </div>
 
           <button type="submit" class="btn btn-primary btn-lg btn-block">
-            Xavfsiz kirish
+            Sign in securely
           </button>
         </form>
 
         <div class="auth-footer">
-          <p>Akkauntingiz yo'qmi? <a href="#" id="go-to-register">Ro'yxatdan o'tish</a></p>
+          <p>Don't have an account? <a href="#" id="go-to-register">Register</a></p>
           <p style="margin-top:0.5rem;">
-            <a href="#" id="clear-all-data" style="font-size:0.75rem;color:var(--color-gray-400);">🗑 Barcha ma'lumotlarni tozalash</a>
+            <a href="#" id="clear-all-data" style="font-size:0.75rem;color:var(--color-gray-400);">🗑 Clear all data</a>
           </p>
         </div>
       </div>
@@ -79,67 +79,67 @@
 
         <!-- Step 1: Email -->
         <div id="forgot-step-email">
-          <h2 class="auth-title">Parolni tiklash</h2>
-          <p class="auth-subtitle">Email manzilingizni kiriting</p>
+          <h2 class="auth-title">Reset password</h2>
+          <p class="auth-subtitle">Enter your email address</p>
           <form class="auth-form" id="forgot-email-form">
             <div class="form-group">
-              <label class="form-label" for="forgot-email">Email manzil</label>
+              <label class="form-label" for="forgot-email">Email address</label>
               <div class="input-group">
                 <span class="input-icon">📧</span>
                 <input type="email" id="forgot-email" class="form-input" placeholder="Email" required>
               </div>
             </div>
-            <button type="submit" class="btn btn-primary btn-lg btn-block">Davom etish</button>
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Continue</button>
           </form>
         </div>
 
-        <!-- Step 2: Kalit so'z -->
+        <!-- Step 2: Security phrase -->
         <div id="forgot-step-hint" class="hidden">
-          <h2 class="auth-title">Kalit so'z</h2>
+          <h2 class="auth-title">Security phrase</h2>
           <p class="auth-subtitle" id="forgot-hint-show"></p>
           <form class="auth-form" id="forgot-hint-form">
             <div class="form-group">
-              <label class="form-label" for="forgot-hint-input">Kalit so'zingiz</label>
+              <label class="form-label" for="forgot-hint-input">Your security phrase</label>
               <div class="input-group">
                 <span class="input-icon">💡</span>
-                <input type="text" id="forgot-hint-input" class="form-input" placeholder="Kalit so'zni kiriting" required autofocus>
+                <input type="text" id="forgot-hint-input" class="form-input" placeholder="Enter security phrase" required autofocus>
               </div>
             </div>
-            <button type="submit" class="btn btn-primary btn-lg btn-block">Tasdiqlash</button>
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Verify</button>
           </form>
         </div>
 
-        <!-- Step 3: Yangi parol -->
+        <!-- Step 3: New password -->
         <div id="forgot-step-newpass" class="hidden">
-          <h2 class="auth-title">Yangi parol</h2>
-          <p class="auth-subtitle">Yangi parolingizni o'rnating</p>
+          <h2 class="auth-title">New password</h2>
+          <p class="auth-subtitle">Set your new password</p>
           <form class="auth-form" id="forgot-newpass-form">
             <div class="form-group">
-              <label class="form-label" for="forgot-newpass">Yangi parol</label>
+              <label class="form-label" for="forgot-newpass">New password</label>
               <div class="input-group">
                 <span class="input-icon">🔒</span>
-                <input type="password" id="forgot-newpass" class="form-input has-toggle" placeholder="Yangi parol" required>
-                <button type="button" class="password-toggle" data-target="forgot-newpass" aria-label="Parolni ko'rsatish">
+                <input type="password" id="forgot-newpass" class="form-input has-toggle" placeholder="New password" required>
+                <button type="button" class="password-toggle" data-target="forgot-newpass" aria-label="Show password">
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label" for="forgot-newpass2">Parolni tasdiqlang</label>
+              <label class="form-label" for="forgot-newpass2">Confirm password</label>
               <div class="input-group">
                 <span class="input-icon">🔒</span>
-                <input type="password" id="forgot-newpass2" class="form-input has-toggle" placeholder="Parolni qaytaring" required>
-                <button type="button" class="password-toggle" data-target="forgot-newpass2" aria-label="Parolni ko'rsatish">
+                <input type="password" id="forgot-newpass2" class="form-input has-toggle" placeholder="Repeat password" required>
+                <button type="button" class="password-toggle" data-target="forgot-newpass2" aria-label="Show password">
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
               </div>
             </div>
-            <button type="submit" class="btn btn-primary btn-lg btn-block">Parolni yangilash</button>
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Update password</button>
           </form>
         </div>
 
         <div class="auth-footer" style="margin-top:1.5rem;">
-          <p><a href="#" id="forgot-back-login">← Loginga qaytish</a></p>
+          <p><a href="#" id="forgot-back-login">← Back to login</a></p>
         </div>
       </div>
     </div>
@@ -155,20 +155,20 @@
           <div class="logo-icon">🔐</div>
           <h1>Secure Social</h1>
         </div>
-        <h2 class="auth-title">Ro'yxatdan o'tish</h2>
-        <p class="auth-subtitle">Ijtimoiy tarmoqlarni xavfsiz boshqarishni boshlang</p>
+        <h2 class="auth-title">Create account</h2>
+        <p class="auth-subtitle">Start managing your social media securely</p>
 
         <form class="auth-form" id="register-form">
           <div class="form-group">
-            <label class="form-label" for="register-name">To'liq ism <span style="color: var(--color-gray-400);">(ixtiyoriy)</span></label>
+            <label class="form-label" for="register-name">Full name <span style="color: var(--color-gray-400);">(optional)</span></label>
             <div class="input-group">
               <span class="input-icon">👤</span>
-              <input type="text" id="register-name" class="form-input" placeholder="Ism">
+              <input type="text" id="register-name" class="form-input" placeholder="Name">
             </div>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="register-email">Email manzil</label>
+            <label class="form-label" for="register-email">Email address</label>
             <div class="input-group">
               <span class="input-icon">📧</span>
               <input type="email" id="register-email" class="form-input" placeholder="Email" required>
@@ -176,11 +176,11 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="register-password">Parol</label>
+            <label class="form-label" for="register-password">Password</label>
             <div class="input-group">
               <span class="input-icon">🔒</span>
-              <input type="password" id="register-password" class="form-input has-toggle" placeholder="Kuchli parol o'ylab toping" required>
-              <button type="button" class="password-toggle" data-target="register-password" aria-label="Parolni ko'rsatish">
+              <input type="password" id="register-password" class="form-input has-toggle" placeholder="Create a strong password" required>
+              <button type="button" class="password-toggle" data-target="register-password" aria-label="Show password">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
@@ -193,45 +193,45 @@
               </div>
               <span class="strength-label" id="strength-label"></span>
             </div>
-            <p class="form-hint">Kamida 8 ta belgi, harf va raqamlar aralashmasi</p>
+            <p class="form-hint">At least 8 characters, mix of letters and numbers</p>
           </div>
 
           <!-- Terms of Service -->
           <div class="form-group">
             <div style="border:1px solid var(--color-gray-200);border-radius:10px;overflow:hidden;">
               <button type="button" id="terms-toggle-btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;background:var(--color-gray-50);border:none;cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--color-gray-700);">
-                <span>📄 Foydalanish shartlari</span>
+                <span>📄 Terms of Service</span>
                 <span id="terms-arrow" style="transition:transform 0.2s;">▼</span>
               </button>
               <div id="terms-text" style="display:none;padding:1rem;font-size:0.8rem;color:var(--color-gray-600);line-height:1.6;max-height:180px;overflow-y:auto;border-top:1px solid var(--color-gray-200);">
-                <strong>Secure Social Manager — Foydalanish shartlari</strong><br><br>
-                1. <strong>Xizmat haqida.</strong> Ushbu platforma ijtimoiy tarmoq akkauntlarini boshqarish uchun mo'ljallangan. Barcha ma'lumotlar faqat sizning qurilmangizda saqlanadi.<br><br>
-                2. <strong>Maxfiylik.</strong> Biz sizning shaxsiy ma'lumotlaringizni uchinchi shaxslarga bermаymiz. Parollar SHA-256 bilan shifrlangan holda saqlanadi.<br><br>
-                3. <strong>OAuth tokenlar.</strong> Ijtimoiy tarmoq tokenlari faqat brauzeringizning localStorage da saqlanadi va serverga yuborilmaydi.<br><br>
-                4. <strong>Foydalanuvchi majburiyatlari.</strong> Siz faqat o'zingizga tegishli akkauntlarni ulashingiz va qonunchilikka zid bo'lmagan kontent joylashtirrishingiz shart.<br><br>
-                5. <strong>Mas'uliyat.</strong> Platforma foydalanuvchi tomonidan yuborilgan kontent uchun javobgar emas.<br><br>
-                6. <strong>O'zgarishlar.</strong> Shartlar istalgan vaqtda o'zgartirilishi mumkin. Davom etish orqali yangi shartlarga rozilик bildirасiz.
+                <strong>Secure Social Manager — Terms of Service</strong><br><br>
+                1. <strong>About the service.</strong> This platform is designed for managing social media accounts. All data is stored only on your device.<br><br>
+                2. <strong>Privacy.</strong> We do not share your personal information with third parties. Passwords are stored hashed with SHA-256.<br><br>
+                3. <strong>OAuth tokens.</strong> Social network tokens are stored only in your browser's localStorage and are never sent to a server.<br><br>
+                4. <strong>User responsibilities.</strong> You may only connect accounts that belong to you and must not post content that violates applicable laws.<br><br>
+                5. <strong>Liability.</strong> The platform is not responsible for content submitted by users.<br><br>
+                6. <strong>Changes.</strong> Terms may be updated at any time. Continued use constitutes acceptance of the new terms.
               </div>
             </div>
             <label style="display:flex;align-items:flex-start;gap:0.6rem;margin-top:0.75rem;cursor:pointer;font-size:0.85rem;color:var(--color-gray-700);">
               <input type="checkbox" id="terms-agree-checkbox" style="margin-top:2px;width:16px;height:16px;flex-shrink:0;cursor:pointer;" required>
-              <span>Foydalanish shartlarini o'qidim va roziman</span>
+              <span>I have read and agree to the Terms of Service</span>
             </label>
           </div>
 
           <button type="submit" class="btn btn-primary btn-lg btn-block" id="register-submit-btn" disabled style="opacity:0.5;cursor:not-allowed;">
-            Xavfsiz akkaunt yaratish
+            Create secure account
           </button>
         </form>
 
         <div class="auth-footer">
-          <p>Akkauntingiz bormi? <a href="#" id="go-to-login">Kirish</a></p>
+          <p>Already have an account? <a href="#" id="go-to-login">Sign in</a></p>
         </div>
 
         <div style="margin-top: 1.5rem;">
           <div class="security-badge" style="display: inline-flex;">
             <span>🔐</span>
-            <span>Xavfsiz ro'yxat</span>
+            <span>Secure registration</span>
           </div>
         </div>
       </div>
@@ -248,33 +248,33 @@
           <div class="logo-icon">🔑</div>
           <h1>Secure Social</h1>
         </div>
-        <h2 class="auth-title">Ikki bosqichli himoya</h2>
-        <p class="auth-subtitle">Qo'shimcha parol va kalit so'z yarating</p>
+        <h2 class="auth-title">Two-factor authentication</h2>
+        <p class="auth-subtitle">Create a secondary password and security phrase</p>
 
         <form class="auth-form" id="twofa-setup-form">
           <div class="form-group">
-            <label class="form-label" for="twofa-pass">Qo'shimcha parol</label>
+            <label class="form-label" for="twofa-pass">Secondary password</label>
             <div class="input-group">
               <span class="input-icon">🔒</span>
-              <input type="password" id="twofa-pass" class="form-input has-toggle" placeholder="Ikkinchi parolingiz" required>
+              <input type="password" id="twofa-pass" class="form-input has-toggle" placeholder="Your secondary password" required>
               <button type="button" class="password-toggle" data-target="twofa-pass" aria-label="Show password">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
-            <p class="form-hint">Har kirishda login'dan keyin so'raladi</p>
+            <p class="form-hint">Required after each login</p>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="twofa-hint">Kalit so'z (eslatma)</label>
+            <label class="form-label" for="twofa-hint">Security phrase (hint)</label>
             <div class="input-group">
               <span class="input-icon">💡</span>
-              <input type="text" id="twofa-hint" class="form-input" placeholder="Masalan: sevimli rang, shahar..." required>
+              <input type="text" id="twofa-hint" class="form-input" placeholder="e.g. favorite color, city..." required>
             </div>
-            <p class="form-hint">Parolni unutsangiz eslatib turadi — boshqalar ko'rishi mumkin</p>
+            <p class="form-hint">Helps you recover if you forget — visible to others</p>
           </div>
 
           <button type="submit" class="btn btn-primary btn-block">
-            <span>Saqlash va davom etish</span>
+            <span>Save and continue</span>
           </button>
         </form>
       </div>
@@ -291,15 +291,15 @@
           <div class="logo-icon">🛡️</div>
           <h1>Secure Social</h1>
         </div>
-        <h2 class="auth-title">Tasdiqlash</h2>
-        <p class="auth-subtitle">Qo'shimcha parolingizni kiriting</p>
+        <h2 class="auth-title">Verification</h2>
+        <p class="auth-subtitle">Enter your secondary password</p>
 
         <form class="auth-form" id="twofa-verify-form">
           <div class="form-group">
-            <label class="form-label" for="twofa-verify-pass">Qo'shimcha parol</label>
+            <label class="form-label" for="twofa-verify-pass">Secondary password</label>
             <div class="input-group">
               <span class="input-icon">🔒</span>
-              <input type="password" id="twofa-verify-pass" class="form-input has-toggle" placeholder="Ikkinchi parolingiz" required autofocus>
+              <input type="password" id="twofa-verify-pass" class="form-input has-toggle" placeholder="Your secondary password" required autofocus>
               <button type="button" class="password-toggle" data-target="twofa-verify-pass" aria-label="Show password">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
@@ -307,16 +307,16 @@
           </div>
 
           <div class="twofa-hint-box hidden" id="twofa-hint-box">
-            <span class="twofa-hint-label">💡 Kalit so'z:</span>
+            <span class="twofa-hint-label">💡 Security phrase:</span>
             <span class="twofa-hint-value" id="twofa-hint-value"></span>
           </div>
-          <button type="button" class="twofa-hint-btn" id="twofa-show-hint">Kalit so'zni ko'rsatish</button>
+          <button type="button" class="twofa-hint-btn" id="twofa-show-hint">Show security phrase</button>
 
           <button type="submit" class="btn btn-primary btn-block" style="margin-top: 0.8rem;">
-            <span>Tasdiqlash</span>
+            <span>Verify</span>
           </button>
           <button type="button" class="btn btn-ghost btn-block" id="twofa-cancel" style="margin-top: 0.5rem;">
-            Login'ga qaytish
+            Back to login
           </button>
         </form>
       </div>
@@ -336,42 +336,42 @@
           <span>Secure Social</span>
         </div>
       </div>
-      
+
       <nav class="sidebar-nav">
         <div class="nav-section">
-          <div class="nav-section-title">Asosiy</div>
+          <div class="nav-section-title">Main</div>
           <div class="nav-item active" data-page="dashboard">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-            <span>Boshqaruv paneli</span>
+            <span>Dashboard</span>
           </div>
           <div class="nav-item" data-page="create-post">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            <span>Post yaratish</span>
+            <span>Create post</span>
           </div>
           <div class="nav-item" data-page="analytics">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-            <span>Statistika</span>
+            <span>Analytics</span>
           </div>
         </div>
 
         <div class="nav-section">
-          <div class="nav-section-title">Akkaunt</div>
+          <div class="nav-section-title">Account</div>
           <div class="nav-item" data-page="settings">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-            <span>Sozlamalar</span>
+            <span>Settings</span>
           </div>
           <div class="nav-item nav-admin hidden" id="nav-admin" data-page="admin">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 4v6c0 5-4 9-9 10-5-1-9-5-9-10V6l9-4z"/><path d="M9 12l2 2 4-4"/></svg>
-            <span>Admin paneli</span>
+            <span>Admin panel</span>
             <span class="nav-badge">★</span>
           </div>
         </div>
       </nav>
-      
+
       <div class="sidebar-footer">
         <div class="nav-item" id="logout-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-          <span>Chiqish</span>
+          <span>Logout</span>
         </div>
       </div>
     </aside>
@@ -384,7 +384,7 @@
           <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle menu">
             <span></span><span></span><span></span>
           </button>
-          <h2 id="page-title">Boshqaruv paneli</h2>
+          <h2 id="page-title">Dashboard</h2>
         </div>
         <div class="topbar-right">
           <!-- User Menu with Account Switcher -->
@@ -392,20 +392,20 @@
             <div class="user-menu" id="user-menu-btn">
               <div class="user-avatar" id="topbar-avatar">—</div>
               <div class="user-info">
-                <div class="name" id="topbar-name">Foydalanuvchi</div>
-                <div class="role" id="topbar-role">Pro foydalanuvchi</div>
+                <div class="name" id="topbar-name">User</div>
+                <div class="role" id="topbar-role">Pro user</div>
               </div>
               <svg class="user-menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M6 9l6 6 6-6"/></svg>
             </div>
 
             <!-- Account Dropdown -->
             <div class="account-dropdown hidden" id="account-dropdown">
-              <div class="account-dropdown-header">Akkauntlar</div>
+              <div class="account-dropdown-header">Accounts</div>
               <div class="account-list" id="account-list"></div>
               <div class="account-dropdown-footer">
                 <button class="account-add-btn" id="add-account-btn">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 5v14M5 12h14"/></svg>
-                  Akkaunt qo'shish
+                  Add account
                 </button>
               </div>
             </div>
@@ -421,8 +421,8 @@
              ======================================== -->
         <section id="section-dashboard" class="page">
           <div class="welcome-section">
-            <h1>Xush kelibsiz! 👋</h1>
-            <p>Ijtimoiy tarmoqlaringizda bugun nimalar bo'lyapti.</p>
+            <h1>Welcome! 👋</h1>
+            <p>See what's happening on your social networks today.</p>
           </div>
 
           <!-- Stats Grid -->
@@ -431,29 +431,29 @@
               <div class="stat-icon primary">📅</div>
               <div class="stat-content">
                 <h3 data-count="12">0</h3>
-                <p>Rejalashtirilgan postlar</p>
+                <p>Scheduled posts</p>
               </div>
             </div>
             <div class="card stat-card">
               <div class="stat-icon success">🔗</div>
               <div class="stat-content">
                 <h3 data-count="0">0</h3>
-                <p>Ulangan platformalar</p>
+                <p>Connected platforms</p>
               </div>
             </div>
             <div class="card stat-card">
               <div class="stat-icon primary">📊</div>
               <div class="stat-content">
                 <h3 data-count="2400" data-format="k">0</h3>
-                <p>Umumiy qamrov</p>
+                <p>Total reach</p>
               </div>
             </div>
             <div class="card stat-card">
               <div class="stat-icon success">🔒</div>
               <div class="stat-content">
-                <h3>Xavfsiz</h3>
-                <p>Xavfsizlik holati</p>
-                <span class="badge badge-success" style="margin-top: 0.5rem;">Himoyalangan</span>
+                <h3>Secure</h3>
+                <p>Security status</p>
+                <span class="badge badge-success" style="margin-top: 0.5rem;">Protected</span>
               </div>
             </div>
           </div>
@@ -461,51 +461,51 @@
           <!-- Quick Actions -->
           <div class="quick-actions">
             <button class="btn btn-primary" id="quick-create-post">
-              <span>➕</span> Yangi post yaratish
+              <span>➕</span> Create new post
             </button>
             <button class="btn btn-outline" id="quick-view-analytics">
-              <span>📈</span> Statistikani ko'rish
+              <span>📈</span> View analytics
             </button>
           </div>
 
           <!-- Recent Activity -->
           <div class="card">
             <div class="card-header">
-              <h3>So'nggi faoliyat</h3>
+              <h3>Recent activity</h3>
             </div>
             <div class="card-body">
               <div class="activity-list">
                 <div class="activity-item">
                   <div class="activity-icon" style="background: var(--color-primary-light); color: var(--color-primary);">📱</div>
                   <div class="activity-content">
-                    <p><strong>Post yuklandi</strong> Instagram'ga</p>
-                    <span class="time">2 soat oldin</span>
+                    <p><strong>Post uploaded</strong> to Instagram</p>
+                    <span class="time">2 hours ago</span>
                   </div>
-                  <span class="badge badge-success">Muvaffaqiyatli</span>
+                  <span class="badge badge-success">Success</span>
                 </div>
                 <div class="activity-item">
                   <div class="activity-icon" style="background: #E3F2FD; color: #0088CC;">✈️</div>
                   <div class="activity-content">
-                    <p><strong>Post rejalashtirildi</strong> Telegram uchun</p>
-                    <span class="time">4 soat oldin</span>
+                    <p><strong>Post scheduled</strong> for Telegram</p>
+                    <span class="time">4 hours ago</span>
                   </div>
-                  <span class="badge badge-primary">Rejalashtirilgan</span>
+                  <span class="badge badge-primary">Scheduled</span>
                 </div>
                 <div class="activity-item">
                   <div class="activity-icon" style="background: var(--color-success-light); color: var(--color-success);">🔐</div>
                   <div class="activity-content">
-                    <p><strong>Ikki bosqichli himoya</strong> yoqildi</p>
-                    <span class="time">Kecha</span>
+                    <p><strong>Two-factor auth</strong> enabled</p>
+                    <span class="time">Yesterday</span>
                   </div>
-                  <span class="badge badge-success">Xavfsizlik</span>
+                  <span class="badge badge-success">Security</span>
                 </div>
                 <div class="activity-item">
                   <div class="activity-icon" style="background: var(--color-warning-light); color: var(--color-warning);">🔗</div>
                   <div class="activity-content">
-                    <p><strong>Telegram akkaunti</strong> ulandi</p>
-                    <span class="time">2 kun oldin</span>
+                    <p><strong>Telegram account</strong> connected</p>
+                    <span class="time">2 days ago</span>
                   </div>
-                  <span class="badge badge-warning">Integratsiya</span>
+                  <span class="badge badge-warning">Integration</span>
                 </div>
               </div>
             </div>
@@ -517,8 +517,8 @@
              ======================================== -->
         <section id="section-create-post" class="page hidden">
           <div class="welcome-section">
-            <h1>Post yaratish va rejalashtirish</h1>
-            <p>Kontent yarating va maqbul vaqtga rejalashtiring.</p>
+            <h1>Create and schedule posts</h1>
+            <p>Create content and schedule it for the right time.</p>
           </div>
 
           <div class="card">
@@ -526,14 +526,14 @@
               <form id="create-post-form">
                 <!-- Platform Selector -->
                 <div class="form-group">
-                  <label class="form-label">Platformani tanlang</label>
+                  <label class="form-label">Select platform</label>
                   <div class="platform-selector">
                     <label class="platform-option active">
                       <input type="radio" name="platform" value="telegram" checked>
                       <div class="platform-icon telegram"><img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/telegram.svg" alt="Telegram"></div>
                       <div>
                         <strong>Telegram</strong>
-                        <p style="font-size: 0.75rem; color: var(--color-gray-500); margin: 0;">Kanal yoki guruh</p>
+                        <p style="font-size: 0.75rem; color: var(--color-gray-500); margin: 0;">Channel or group</p>
                       </div>
                     </label>
                     <label class="platform-option">
@@ -541,7 +541,7 @@
                       <div class="platform-icon instagram"><img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/instagram.svg" alt="Instagram"></div>
                       <div>
                         <strong>Instagram</strong>
-                        <p style="font-size: 0.75rem; color: var(--color-gray-500); margin: 0;">Lenta posti</p>
+                        <p style="font-size: 0.75rem; color: var(--color-gray-500); margin: 0;">Feed post</p>
                       </div>
                     </label>
                     <label class="platform-option">
@@ -549,7 +549,7 @@
                       <div class="platform-icon facebook"><img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/facebook.svg" alt="Facebook"></div>
                       <div>
                         <strong>Facebook</strong>
-                        <p style="font-size: 0.75rem; color: var(--color-gray-500); margin: 0;">Sahifa yoki guruh</p>
+                        <p style="font-size: 0.75rem; color: var(--color-gray-500); margin: 0;">Page or group</p>
                       </div>
                     </label>
                   </div>
@@ -557,27 +557,27 @@
 
                 <!-- Post Content -->
                 <div class="form-group">
-                  <label class="form-label" for="post-content">Post matni</label>
-                  <textarea id="post-content" class="form-textarea" placeholder="Nima ulashmoqchisiz?" rows="5" required></textarea>
-                  <p class="form-hint"><span id="char-count">0</span>/2200 belgi</p>
+                  <label class="form-label" for="post-content">Post content</label>
+                  <textarea id="post-content" class="form-textarea" placeholder="What would you like to share?" rows="5" required></textarea>
+                  <p class="form-hint"><span id="char-count">0</span>/2200 characters</p>
                 </div>
 
                 <!-- Media Upload -->
                 <div class="form-group">
-                  <label class="form-label" for="post-media">Rasm yoki video (ixtiyoriy)</label>
+                  <label class="form-label" for="post-media">Image or video (optional)</label>
                   <input type="file" id="post-media" class="form-input" accept="image/*,video/*">
-                  <p class="form-hint">Maks. 5 MB — rasm yoki qisqa video</p>
+                  <p class="form-hint">Max. 5 MB — image or short video</p>
                   <div id="media-preview" class="media-preview hidden"></div>
                 </div>
 
                 <!-- Date Time Picker -->
                 <div class="datetime-picker">
                   <div class="form-group">
-                    <label class="form-label" for="post-date">Rejalashtirish sanasi</label>
+                    <label class="form-label" for="post-date">Schedule date</label>
                     <input type="date" id="post-date" class="form-input" required>
                   </div>
                   <div class="form-group">
-                    <label class="form-label" for="post-time">Rejalashtirish vaqti</label>
+                    <label class="form-label" for="post-time">Schedule time</label>
                     <input type="time" id="post-time" class="form-input" required>
                   </div>
                 </div>
@@ -585,13 +585,13 @@
                 <!-- Actions -->
                 <div style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;">
                   <button type="button" class="btn btn-primary btn-lg" id="publish-now-btn">
-                    <span>⚡</span> Hoziroq yuklash
+                    <span>⚡</span> Publish now
                   </button>
                   <button type="submit" class="btn btn-outline btn-lg">
-                    <span>📅</span> Postni rejalashtirish
+                    <span>📅</span> Schedule post
                   </button>
                   <button type="button" class="btn btn-outline btn-lg" id="save-draft-btn">
-                    <span>💾</span> Qoralama saqlash
+                    <span>💾</span> Save draft
                   </button>
                 </div>
               </form>
@@ -600,8 +600,8 @@
               <div class="success-message" id="schedule-success">
                 <span style="font-size: 1.5rem;">✅</span>
                 <div>
-                  <strong>Post muvaffaqiyatli rejalashtirildi!</strong>
-                  <p style="margin: 0; font-size: 0.875rem;">Post belgilangan vaqtda yuklanadi.</p>
+                  <strong>Post successfully scheduled!</strong>
+                  <p style="margin: 0; font-size: 0.875rem;">Post will be published at the scheduled time.</p>
                 </div>
               </div>
             </div>
@@ -610,11 +610,11 @@
           <!-- Posts History -->
           <div class="card" style="margin-top: 1.5rem;">
             <div class="card-header">
-              <h3>📬 Sizning postlaringiz</h3>
+              <h3>📬 Your posts</h3>
             </div>
             <div class="card-body">
               <div id="posts-list" class="posts-list">
-                <p class="text-muted" id="posts-empty">Hali post yo'q — birinchi postingizni yarating 👆</p>
+                <p class="text-muted" id="posts-empty">No posts yet — create your first one 👆</p>
               </div>
             </div>
           </div>
@@ -627,13 +627,13 @@
         <section id="section-analytics" class="page hidden">
           <div class="analytics-header">
             <div>
-              <h1>Statistika umumiy ko'rinishi</h1>
-              <p class="text-muted">Ijtimoiy tarmoq samaradorligini kuzating</p>
+              <h1>Analytics overview</h1>
+              <p class="text-muted">Track your social media performance</p>
             </div>
             <div class="date-range-selector">
-              <button class="date-range-btn">7 kun</button>
-              <button class="date-range-btn active">30 kun</button>
-              <button class="date-range-btn">90 kun</button>
+              <button class="date-range-btn">7 days</button>
+              <button class="date-range-btn active">30 days</button>
+              <button class="date-range-btn">90 days</button>
             </div>
           </div>
 
@@ -641,22 +641,22 @@
           <div class="engagement-grid mb-6">
             <div class="engagement-card">
               <div class="value" data-count="12500" data-format="k">0</div>
-              <div class="label">Umumiy qamrov</div>
+              <div class="label">Total reach</div>
               <div class="change positive">↑ 12.5%</div>
             </div>
             <div class="engagement-card">
               <div class="value" data-count="3200" data-format="k">0</div>
-              <div class="label">Faollik</div>
+              <div class="label">Engagement</div>
               <div class="change positive">↑ 8.3%</div>
             </div>
             <div class="engagement-card">
               <div class="value" data-count="847">0</div>
-              <div class="label">Yoqtirishlar</div>
+              <div class="label">Likes</div>
               <div class="change positive">↑ 15.2%</div>
             </div>
             <div class="engagement-card">
               <div class="value" data-count="156">0</div>
-              <div class="label">Ulashishlar</div>
+              <div class="label">Shares</div>
               <div class="change negative">↓ 2.1%</div>
             </div>
           </div>
@@ -664,7 +664,7 @@
           <!-- Charts -->
           <div class="charts-grid">
             <div class="chart-card">
-              <h4>📈 Vaqt bo'yicha qamrov</h4>
+              <h4>📈 Reach over time</h4>
               <div class="chart-placeholder">
                 <div class="chart-bar" style="height: 45%;"></div>
                 <div class="chart-bar" style="height: 60%;"></div>
@@ -681,7 +681,7 @@
               </div>
             </div>
             <div class="chart-card">
-              <h4>❤️ Faollik darajasi</h4>
+              <h4>❤️ Engagement rate</h4>
               <div class="chart-placeholder">
                 <div class="chart-bar" style="height: 70%; background: linear-gradient(180deg, #10B981, #34D399);"></div>
                 <div class="chart-bar" style="height: 55%; background: linear-gradient(180deg, #10B981, #34D399);"></div>
@@ -702,7 +702,7 @@
           <!-- Platform Breakdown -->
           <div class="card mt-6">
             <div class="card-header">
-              <h3>Platformalar samaradorligi</h3>
+              <h3>Platform performance</h3>
             </div>
             <div class="card-body">
               <div style="display: flex; gap: 2rem;">
@@ -711,21 +711,21 @@
                     <div class="platform-icon telegram" style="width: 48px; height: 48px;">✈️</div>
                     <div>
                       <strong>Telegram</strong>
-                      <p style="margin: 0; color: var(--color-gray-500); font-size: 0.875rem;">Bu oy 8 ta post</p>
+                      <p style="margin: 0; color: var(--color-gray-500); font-size: 0.875rem;">8 posts this month</p>
                     </div>
                   </div>
                   <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
                     <div>
                       <div style="font-size: 1.25rem; font-weight: 700;">6.8K</div>
-                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Qamrov</div>
+                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Reach</div>
                     </div>
                     <div>
                       <div style="font-size: 1.25rem; font-weight: 700;">1.2K</div>
-                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Ko'rishlar</div>
+                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Views</div>
                     </div>
                     <div>
                       <div style="font-size: 1.25rem; font-weight: 700;">89</div>
-                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Ulashishlar</div>
+                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Shares</div>
                     </div>
                   </div>
                 </div>
@@ -734,21 +734,21 @@
                     <div class="platform-icon instagram" style="width: 48px; height: 48px;">📷</div>
                     <div>
                       <strong>Instagram</strong>
-                      <p style="margin: 0; color: var(--color-gray-500); font-size: 0.875rem;">Bu oy 5 ta post</p>
+                      <p style="margin: 0; color: var(--color-gray-500); font-size: 0.875rem;">5 posts this month</p>
                     </div>
                   </div>
                   <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
                     <div>
                       <div style="font-size: 1.25rem; font-weight: 700;">5.7K</div>
-                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Qamrov</div>
+                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Reach</div>
                     </div>
                     <div>
                       <div style="font-size: 1.25rem; font-weight: 700;">758</div>
-                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Yoqtirishlar</div>
+                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Likes</div>
                     </div>
                     <div>
                       <div style="font-size: 1.25rem; font-weight: 700;">67</div>
-                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Izohlar</div>
+                      <div style="font-size: 0.75rem; color: var(--color-gray-500);">Comments</div>
                     </div>
                   </div>
                 </div>
@@ -762,24 +762,24 @@
              ======================================== -->
         <section id="section-settings" class="page hidden">
           <div class="welcome-section">
-            <h1>Sozlamalar va xavfsizlik</h1>
-            <p>Akkaunt sozlamalari va xavfsizlikni boshqaring.</p>
+            <h1>Settings &amp; security</h1>
+            <p>Manage your account settings and security.</p>
           </div>
 
           <div class="settings-grid">
             <!-- Settings Navigation -->
             <div class="settings-nav">
               <div class="settings-nav-item active" data-settings="security">
-                <span>🔒</span> Xavfsizlik
+                <span>🔒</span> Security
               </div>
               <div class="settings-nav-item" data-settings="account">
-                <span>👤</span> Akkaunt
+                <span>👤</span> Account
               </div>
               <div class="settings-nav-item" data-settings="platforms">
-                <span>🔗</span> Platformalar
+                <span>🔗</span> Platforms
               </div>
               <div class="settings-nav-item" data-settings="notifications">
-                <span>🔔</span> Bildirishnomalar
+                <span>🔔</span> Notifications
               </div>
             </div>
 
@@ -789,11 +789,11 @@
               <!-- SECURITY PANEL -->
               <div data-settings-panel="security">
                 <div class="settings-section">
-                  <h3>🔐 Xavfsizlik sozlamalari</h3>
+                  <h3>🔐 Security settings</h3>
                   <div class="setting-row">
                     <div class="setting-info">
-                      <h4>Ikki bosqichli himoya</h4>
-                      <p>Akkauntingizga qo'shimcha xavfsizlik qatlamini qo'shing</p>
+                      <h4>Two-factor authentication</h4>
+                      <p>Add an extra layer of security to your account</p>
                     </div>
                     <label class="toggle-switch">
                       <input type="checkbox" id="2fa-toggle" checked>
@@ -802,15 +802,15 @@
                   </div>
                   <div class="setting-row">
                     <div class="setting-info">
-                      <h4>Parolni o'zgartirish</h4>
-                      <p>Xavfsizlik uchun parolni muntazam yangilab turing</p>
+                      <h4>Change password</h4>
+                      <p>Regularly update your password for security</p>
                     </div>
-                    <button class="btn btn-outline" id="change-password-btn">Parolni o'zgartirish</button>
+                    <button class="btn btn-outline" id="change-password-btn">Change password</button>
                   </div>
                   <div class="setting-row">
                     <div class="setting-info">
-                      <h4>Kirish bildirishnomalari</h4>
-                      <p>Akkauntingizga kirilganida sizni xabardor qiladi</p>
+                      <h4>Login notifications</h4>
+                      <p>Notifies you when someone logs into your account</p>
                     </div>
                     <label class="toggle-switch">
                       <input type="checkbox" checked>
@@ -820,39 +820,39 @@
                 </div>
 
                 <div class="settings-section">
-                  <h3>📋 Xavfsizlik jurnali</h3>
+                  <h3>📋 Security log</h3>
                   <div class="security-log">
                     <div class="log-item">
                       <div class="log-icon success">✓</div>
                       <div class="log-content">
-                        <div class="action">Muvaffaqiyatli kirish</div>
-                        <div class="details">macOS'da Chrome • Toshkent</div>
+                        <div class="action">Successful login</div>
+                        <div class="details">Chrome on macOS • Tashkent</div>
                       </div>
-                      <div class="log-time">Bugun, 14:30</div>
+                      <div class="log-time">Today, 14:30</div>
                     </div>
                     <div class="log-item">
                       <div class="log-icon success">✓</div>
                       <div class="log-content">
-                        <div class="action">Ikki bosqichli himoya yoqildi</div>
-                        <div class="details">Xavfsizlik sozlamasi yangilandi</div>
+                        <div class="action">Two-factor auth enabled</div>
+                        <div class="details">Security setting updated</div>
                       </div>
-                      <div class="log-time">Kecha, 10:15</div>
+                      <div class="log-time">Yesterday, 10:15</div>
                     </div>
                     <div class="log-item">
                       <div class="log-icon warning">!</div>
                       <div class="log-content">
-                        <div class="action">Muvaffaqiyatsiz kirish urinishi</div>
-                        <div class="details">Windows'da Chrome • Noma'lum joy</div>
+                        <div class="action">Failed login attempt</div>
+                        <div class="details">Chrome on Windows • Unknown location</div>
                       </div>
-                      <div class="log-time">28-yan, 20:45</div>
+                      <div class="log-time">Jan 28, 20:45</div>
                     </div>
                     <div class="log-item">
                       <div class="log-icon success">✓</div>
                       <div class="log-content">
-                        <div class="action">Parol o'zgartirildi</div>
-                        <div class="details">Xavfsizlik sozlamasi yangilandi</div>
+                        <div class="action">Password changed</div>
+                        <div class="details">Security setting updated</div>
                       </div>
-                      <div class="log-time">25-yan, 15:20</div>
+                      <div class="log-time">Jan 25, 15:20</div>
                     </div>
                   </div>
                 </div>
@@ -861,8 +861,8 @@
                   <div style="display: flex; align-items: center; gap: 1rem;">
                     <span style="font-size: 2rem;">🛡️</span>
                     <div>
-                      <h3 style="margin: 0; border: none; padding: 0;">Akkauntingiz himoyalangan</h3>
-                      <p style="margin: 0.5rem 0 0; color: var(--color-gray-600);">Ikki bosqichli himoya yoqilgan. Sessiyangiz 256-bit SSL bilan shifrlangan.</p>
+                      <h3 style="margin: 0; border: none; padding: 0;">Your account is protected</h3>
+                      <p style="margin: 0.5rem 0 0; color: var(--color-gray-600);">Two-factor auth is enabled. Your session is encrypted with 256-bit SSL.</p>
                     </div>
                   </div>
                 </div>
@@ -871,54 +871,54 @@
               <!-- ACCOUNT PANEL -->
               <div data-settings-panel="account" class="hidden">
                 <div class="settings-section">
-                  <h3>👤 Akkaunt ma'lumotlari</h3>
+                  <h3>👤 Account details</h3>
                   <div class="form-group avatar-upload-group">
-                    <label class="form-label">Profil rasmi</label>
+                    <label class="form-label">Profile picture</label>
                     <div class="avatar-upload-row">
                       <div class="avatar-preview" id="avatar-preview">—</div>
                       <div class="avatar-upload-controls">
-                        <label for="avatar-input" class="btn btn-outline btn-sm">📷 Rasm tanlash</label>
+                        <label for="avatar-input" class="btn btn-outline btn-sm">📷 Choose image</label>
                         <input type="file" id="avatar-input" accept="image/*" hidden>
-                        <button type="button" class="btn btn-ghost btn-sm" id="avatar-remove-btn" style="display:none;">🗑 O'chirish</button>
-                        <p class="form-hint" style="margin: 0.25rem 0 0;">PNG/JPG, maks. 2 MB</p>
+                        <button type="button" class="btn btn-ghost btn-sm" id="avatar-remove-btn" style="display:none;">🗑 Remove</button>
+                        <p class="form-hint" style="margin: 0.25rem 0 0;">PNG/JPG, max. 2 MB</p>
                       </div>
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="form-label" for="account-name">To'liq ism</label>
-                    <input type="text" id="account-name" class="form-input" placeholder="To'liq ism">
+                    <label class="form-label" for="account-name">Full name</label>
+                    <input type="text" id="account-name" class="form-input" placeholder="Full name">
                   </div>
                   <div class="form-group">
-                    <label class="form-label" for="account-email">Email manzil</label>
+                    <label class="form-label" for="account-email">Email address</label>
                     <input type="email" id="account-email" class="form-input" readonly>
                   </div>
                   <div class="form-group">
-                    <label class="form-label" for="account-username">Foydalanuvchi nomi</label>
+                    <label class="form-label" for="account-username">Username</label>
                     <input type="text" id="account-username" class="form-input" placeholder="@username">
                   </div>
                   <div class="form-group">
-                    <label class="form-label" for="account-birthday">Tug'ilgan kuni</label>
+                    <label class="form-label" for="account-birthday">Date of birth</label>
                     <input type="date" id="account-birthday" class="form-input">
                   </div>
                   <div class="form-group">
-                    <label class="form-label" for="account-gender">Jinsi</label>
+                    <label class="form-label" for="account-gender">Gender</label>
                     <select id="account-gender" class="form-input">
-                      <option value="">Tanlang…</option>
-                      <option value="male">Erkak</option>
-                      <option value="female">Ayol</option>
-                      <option value="other">Boshqa</option>
+                      <option value="">Select…</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
                     </select>
                   </div>
-                  <button class="btn btn-primary" id="save-account-btn">O'zgarishlarni saqlash</button>
+                  <button class="btn btn-primary" id="save-account-btn">Save changes</button>
                 </div>
                 <div class="settings-section">
-                  <h3>🗑️ Xavfli hudud</h3>
+                  <h3>🗑️ Danger zone</h3>
                   <div class="setting-row">
                     <div class="setting-info">
-                      <h4>Akkauntni o'chirish</h4>
-                      <p>Akkauntingiz va barcha ma'lumotlaringizni butunlay o'chiradi</p>
+                      <h4>Delete account</h4>
+                      <p>Permanently deletes your account and all your data</p>
                     </div>
-                    <button class="btn btn-outline" style="border-color: var(--color-danger); color: var(--color-danger);">Akkauntni o'chirish</button>
+                    <button class="btn btn-outline" style="border-color: var(--color-danger); color: var(--color-danger);">Delete account</button>
                   </div>
                 </div>
               </div>
@@ -926,8 +926,8 @@
               <!-- PLATFORMS PANEL -->
               <div data-settings-panel="platforms" class="hidden">
                 <div class="settings-section">
-                  <h3>🔗 Ulangan platformalar</h3>
-                  <p class="text-muted" style="margin-bottom: 1.25rem; font-size: 0.875rem;">Postlarni rejalashtirish uchun ijtimoiy tarmoq akkauntlaringizni ulang.</p>
+                  <h3>🔗 Connected platforms</h3>
+                  <p class="text-muted" style="margin-bottom: 1.25rem; font-size: 0.875rem;">Connect your social media accounts to schedule posts.</p>
                   <div class="connected-platforms" id="platforms-list">
 
                     <!-- Telegram -->
@@ -935,18 +935,18 @@
                       <div class="platform-icon telegram"><img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/telegram.svg" alt="Telegram"></div>
                       <div class="platform-connection-info">
                         <h4>Telegram</h4>
-                        <p class="platform-status-text">Ulanmagan</p>
+                        <p class="platform-status-text">Not connected</p>
                       </div>
-                      <button class="btn btn-primary platform-action-btn" style="margin-left: auto;" data-action="connect" data-platform="telegram">Ulash</button>
+                      <button class="btn btn-primary platform-action-btn" style="margin-left: auto;" data-action="connect" data-platform="telegram">Connect</button>
                     </div>
                     <!-- Telegram bot config (shown when connected) -->
                     <div id="telegram-config" class="hidden" style="background:var(--color-gray-50);border-radius:8px;padding:1rem 1.1rem;margin-top:-0.25rem;margin-bottom:0.5rem;border:1px solid var(--color-gray-200);">
-                      <p style="font-size:0.82rem;font-weight:600;margin:0 0 0.6rem;color:var(--color-gray-700);">🤖 Bot sozlamalari (kanalga yuborish uchun)</p>
-                      <p style="font-size:0.78rem;color:var(--color-gray-500);margin:0 0 0.75rem;">BotFather dan token oling va botni kanalga admin qiling</p>
+                      <p style="font-size:0.82rem;font-weight:600;margin:0 0 0.6rem;color:var(--color-gray-700);">🤖 Bot settings (for channel posting)</p>
+                      <p style="font-size:0.78rem;color:var(--color-gray-500);margin:0 0 0.75rem;">Get a token from BotFather and make the bot admin in your channel</p>
                       <div style="display:flex;flex-direction:column;gap:0.5rem;">
                         <input type="password" id="tg-bot-token" class="form-input" placeholder="Bot token: 123456:AAH..." style="font-size:0.85rem;">
-                        <input type="text" id="tg-channel" class="form-input" placeholder="Kanal: @mychannel yoki -100123456" style="font-size:0.85rem;">
-                        <button class="btn btn-primary btn-sm" id="save-tg-config" style="align-self:flex-start;padding:0.45rem 1rem;">💾 Saqlash</button>
+                        <input type="text" id="tg-channel" class="form-input" placeholder="Channel: @mychannel or -100123456" style="font-size:0.85rem;">
+                        <button class="btn btn-primary btn-sm" id="save-tg-config" style="align-self:flex-start;padding:0.45rem 1rem;">💾 Save</button>
                       </div>
                     </div>
 
@@ -955,9 +955,9 @@
                       <div class="platform-icon instagram"><img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/instagram.svg" alt="Instagram"></div>
                       <div class="platform-connection-info">
                         <h4>Instagram</h4>
-                        <p class="platform-status-text">Ulanmagan</p>
+                        <p class="platform-status-text">Not connected</p>
                       </div>
-                      <button class="btn btn-primary platform-action-btn" style="margin-left: auto;" data-action="connect" data-platform="instagram">Ulash</button>
+                      <button class="btn btn-primary platform-action-btn" style="margin-left: auto;" data-action="connect" data-platform="instagram">Connect</button>
                     </div>
 
                     <!-- Facebook -->
@@ -965,20 +965,20 @@
                       <div class="platform-icon facebook"><img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/facebook.svg" alt="Facebook"></div>
                       <div class="platform-connection-info">
                         <h4>Facebook</h4>
-                        <p class="platform-status-text">Ulanmagan</p>
+                        <p class="platform-status-text">Not connected</p>
                       </div>
-                      <button class="btn btn-primary platform-action-btn" style="margin-left: auto;" data-action="connect" data-platform="facebook">Ulash</button>
+                      <button class="btn btn-primary platform-action-btn" style="margin-left: auto;" data-action="connect" data-platform="facebook">Connect</button>
                     </div>
                     <!-- Facebook page token config -->
                     <div id="facebook-config" class="hidden" style="background:var(--color-gray-50);border-radius:8px;padding:1rem 1.1rem;margin-top:-0.25rem;margin-bottom:0.5rem;border:1px solid var(--color-gray-200);">
-                      <p style="font-size:0.82rem;font-weight:600;margin:0 0 0.4rem;color:var(--color-gray-700);">📘 Facebook sahifa sozlamalari</p>
+                      <p style="font-size:0.82rem;font-weight:600;margin:0 0 0.4rem;color:var(--color-gray-700);">📘 Facebook page settings</p>
                       <p style="font-size:0.78rem;color:var(--color-gray-500);margin:0 0 0.75rem;">
-                        <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener" style="color:#1877F2;">Graph API Explorer</a> saytiga kiring → tokenni oling va pastga kiriting
+                        Go to <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener" style="color:#1877F2;">Graph API Explorer</a> → get your token and enter it below
                       </p>
                       <div style="display:flex;flex-direction:column;gap:0.5rem;">
                         <input type="text" id="fb-page-id" class="form-input" placeholder="Page ID: 123456789" style="font-size:0.85rem;">
                         <input type="password" id="fb-page-token" class="form-input" placeholder="Page Access Token: EAABs..." style="font-size:0.85rem;">
-                        <button class="btn btn-primary btn-sm" id="save-fb-config" style="align-self:flex-start;padding:0.45rem 1rem;">💾 Saqlash</button>
+                        <button class="btn btn-primary btn-sm" id="save-fb-config" style="align-self:flex-start;padding:0.45rem 1rem;">💾 Save</button>
                       </div>
                     </div>
 
@@ -987,9 +987,9 @@
                       <div class="platform-icon twitter"><img src="https://cdn.jsdelivr.net/npm/simple-icons@14/icons/x.svg" alt="X"></div>
                       <div class="platform-connection-info">
                         <h4>Twitter / X</h4>
-                        <p class="platform-status-text">Ulanmagan</p>
+                        <p class="platform-status-text">Not connected</p>
                       </div>
-                      <button class="btn btn-primary platform-action-btn" style="margin-left: auto;" data-action="connect" data-platform="twitter">Ulash</button>
+                      <button class="btn btn-primary platform-action-btn" style="margin-left: auto;" data-action="connect" data-platform="twitter">Connect</button>
                     </div>
 
                   </div>
@@ -999,11 +999,11 @@
               <!-- NOTIFICATIONS PANEL -->
               <div data-settings-panel="notifications" class="hidden">
                 <div class="settings-section">
-                  <h3>🔔 Bildirishnoma sozlamalari</h3>
+                  <h3>🔔 Notification settings</h3>
                   <div class="setting-row">
                     <div class="setting-info">
-                      <h4>Post chop etildi</h4>
-                      <p>Rejalashtirilgan post yuklangach sizni xabardor qiladi</p>
+                      <h4>Post published</h4>
+                      <p>Notifies you when a scheduled post is published</p>
                     </div>
                     <label class="toggle-switch">
                       <input type="checkbox" checked>
@@ -1012,8 +1012,8 @@
                   </div>
                   <div class="setting-row">
                     <div class="setting-info">
-                      <h4>Haftalik email hisobot</h4>
-                      <p>Ijtimoiy tarmoq natijalari haqida haftalik xulosa</p>
+                      <h4>Weekly email report</h4>
+                      <p>Weekly summary of your social media results</p>
                     </div>
                     <label class="toggle-switch">
                       <input type="checkbox" checked>
@@ -1022,8 +1022,8 @@
                   </div>
                   <div class="setting-row">
                     <div class="setting-info">
-                      <h4>Xavfsizlik ogohlantirishlari</h4>
-                      <p>Shubhali kirish urinishlari haqida xabar beradi</p>
+                      <h4>Security alerts</h4>
+                      <p>Notifies you about suspicious login attempts</p>
                     </div>
                     <label class="toggle-switch">
                       <input type="checkbox" checked>
@@ -1032,8 +1032,8 @@
                   </div>
                   <div class="setting-row">
                     <div class="setting-info">
-                      <h4>Brauzer push bildirishnomalari</h4>
-                      <p>Real vaqt yangilanishlari uchun brauzer bildirishnomalari</p>
+                      <h4>Browser push notifications</h4>
+                      <p>Browser notifications for real-time updates</p>
                     </div>
                     <label class="toggle-switch">
                       <input type="checkbox">
@@ -1054,8 +1054,8 @@
 
         <section id="section-admin" class="page hidden">
           <div class="welcome-section">
-            <h1>🛡️ Admin paneli</h1>
-            <p>Foydalanuvchilar, OAuth ulanishlar va demo holatini boshqarish.</p>
+            <h1>🛡️ Admin panel</h1>
+            <p>Manage users, OAuth connections, and demo state.</p>
           </div>
 
           <!-- Stat cards -->
@@ -1063,28 +1063,28 @@
             <div class="admin-stat-card">
               <div class="admin-stat-icon" style="background:#6366F1;">👥</div>
               <div>
-                <div class="admin-stat-label">Ro'yxatdan o'tgan foydalanuvchilar</div>
+                <div class="admin-stat-label">Registered users</div>
                 <div class="admin-stat-value" id="admin-stat-users">0</div>
               </div>
             </div>
             <div class="admin-stat-card">
               <div class="admin-stat-icon" style="background:#10B981;">🔗</div>
               <div>
-                <div class="admin-stat-label">OAuth ulanishlar</div>
+                <div class="admin-stat-label">OAuth connections</div>
                 <div class="admin-stat-value" id="admin-stat-oauth">0</div>
               </div>
             </div>
             <div class="admin-stat-card">
               <div class="admin-stat-icon" style="background:#F59E0B;">💾</div>
               <div>
-                <div class="admin-stat-label">Xotira sarfi</div>
+                <div class="admin-stat-label">Storage used</div>
                 <div class="admin-stat-value" id="admin-stat-storage">0 B</div>
               </div>
             </div>
             <div class="admin-stat-card">
               <div class="admin-stat-icon" style="background:#EC4899;">🕐</div>
               <div>
-                <div class="admin-stat-label">Sessiya boshlandi</div>
+                <div class="admin-stat-label">Session started</div>
                 <div class="admin-stat-value" id="admin-stat-session">—</div>
               </div>
             </div>
@@ -1093,21 +1093,21 @@
           <!-- Users table -->
           <div class="admin-card">
             <div class="admin-card-header">
-              <h3>Ro'yxatdan o'tgan foydalanuvchilar</h3>
-              <button class="btn btn-outline btn-sm" id="admin-refresh">↻ Yangilash</button>
+              <h3>Registered users</h3>
+              <button class="btn btn-outline btn-sm" id="admin-refresh">↻ Refresh</button>
             </div>
             <div class="admin-table-wrap">
               <table class="admin-table">
                 <thead>
                   <tr>
                     <th>Email</th>
-                    <th>Ism</th>
-                    <th>Ro'yxatdan o'tgan</th>
-                    <th>Amallar</th>
+                    <th>Name</th>
+                    <th>Registered</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody id="admin-users-body">
-                  <tr><td colspan="4" class="admin-empty">Hali foydalanuvchilar yo'q</td></tr>
+                  <tr><td colspan="4" class="admin-empty">No users yet</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1116,39 +1116,39 @@
           <!-- OAuth connections -->
           <div class="admin-card">
             <div class="admin-card-header">
-              <h3>OAuth ulanishlar</h3>
+              <h3>OAuth connections</h3>
             </div>
             <div id="admin-oauth-list" class="admin-oauth-list">
-              <p class="admin-empty">Hech qanday akkaunt ulanmagan</p>
+              <p class="admin-empty">No accounts connected</p>
             </div>
           </div>
 
           <!-- Danger zone -->
           <div class="admin-card admin-danger">
             <div class="admin-card-header">
-              <h3>⚠️ Xavfli hudud</h3>
+              <h3>⚠️ Danger zone</h3>
             </div>
             <div class="admin-danger-list">
               <div class="admin-danger-row">
                 <div>
-                  <strong>Foydalanuvchilar bazasini tozalash</strong>
-                  <p>Barcha ro'yxatdan o'tgan foydalanuvchilarni o'chiradi</p>
+                  <strong>Clear user database</strong>
+                  <p>Deletes all registered users</p>
                 </div>
-                <button class="btn btn-danger" id="admin-clear-users">Tozalash</button>
+                <button class="btn btn-danger" id="admin-clear-users">Clear</button>
               </div>
               <div class="admin-danger-row">
                 <div>
-                  <strong>OAuth ulanishlarni tozalash</strong>
-                  <p>Barcha Facebook/Instagram/Telegram token'larni o'chiradi</p>
+                  <strong>Clear OAuth connections</strong>
+                  <p>Deletes all Facebook/Instagram/Telegram tokens</p>
                 </div>
-                <button class="btn btn-danger" id="admin-clear-oauth">Tozalash</button>
+                <button class="btn btn-danger" id="admin-clear-oauth">Clear</button>
               </div>
               <div class="admin-danger-row">
                 <div>
-                  <strong>Hamma ma'lumotlarni tozalash</strong>
-                  <p>LocalStorage to'liq tozalanadi + sahifa yangilanadi</p>
+                  <strong>Clear all data</strong>
+                  <p>Fully wipes localStorage and reloads the page</p>
                 </div>
-                <button class="btn btn-danger" id="admin-clear-all">Hammasini tozalash</button>
+                <button class="btn btn-danger" id="admin-clear-all">Clear all</button>
               </div>
             </div>
           </div>
@@ -1166,7 +1166,7 @@
       <!-- STEP 1: Platform picker -->
       <div id="modal-step-picker">
         <div class="dark-modal-header">
-          <h3 class="dark-modal-title">Hisob ulash</h3>
+          <h3 class="dark-modal-title">Connect account</h3>
           <button class="dark-close-btn" id="modal-close">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
@@ -1174,7 +1174,7 @@
         <div class="dark-modal-body">
           <div class="picker-search-wrap">
             <svg class="picker-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="17" height="17"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-            <input type="text" id="platform-search" class="picker-search-input" placeholder="Qidirish...">
+            <input type="text" id="platform-search" class="picker-search-input" placeholder="Search...">
           </div>
           <div class="platform-picker-grid" id="platform-picker-grid"></div>
         </div>
@@ -1208,9 +1208,9 @@
         <div class="dark-modal-footer">
           <button class="platform-oauth-btn" id="detail-connect-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="17" height="17"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            <span id="detail-connect-text">Ulash</span>
+            <span id="detail-connect-text">Connect</span>
           </button>
-          <p class="platform-redirect-note">Tashqi sahifaga yo'naltirilasiz</p>
+          <p class="platform-redirect-note">You will be redirected to an external page</p>
         </div>
       </div>
 
@@ -1218,8 +1218,8 @@
       <div id="modal-step-loading" class="hidden">
         <div class="dark-modal-body dark-center-body">
           <div class="dark-spinner"></div>
-          <p class="dark-loading-title" id="modal-loading-title">Ulanmoqda...</p>
-          <p class="dark-loading-sub" id="modal-loading-sub">Iltimos kuting</p>
+          <p class="dark-loading-title" id="modal-loading-title">Connecting...</p>
+          <p class="dark-loading-sub" id="modal-loading-sub">Please wait</p>
         </div>
       </div>
 
