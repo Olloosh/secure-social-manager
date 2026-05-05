@@ -109,6 +109,12 @@ function runCountersIn(section) {
 }
 
 function showSection(sectionName) {
+  // Admin section guard — only admin@ssm.uz can access
+  if (sectionName === 'admin' && !isAdmin(getSession())) {
+    showToast('Ruxsat yo\'q', 'error');
+    sectionName = 'dashboard';
+  }
+
   Object.values(sections).forEach(section => section.classList.add('hidden'));
 
   const section = sections[sectionName];
@@ -1908,6 +1914,7 @@ function formatBytes(n) {
 
 // Render all admin panel content
 function renderAdminPanel() {
+  if (!isAdmin(getSession())) return;
   const users = loadUsers();
   const emails = Object.keys(users);
 
